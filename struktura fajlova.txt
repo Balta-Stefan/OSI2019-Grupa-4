@@ -1,0 +1,13 @@
+1)korisnici.txt: korisnikID-korisnikIme-korisnikSifra-broj
+2)administratori.txt: adminID-adminIme-adminSifra
+3)korisnikDogadjaj.txt: imeDogadjaja-korisnikID
+4)folder imeDogadjaja:
+	-slika
+	-opis.txt
+	-kratakOpis.txt - 1-3 recenice, za naslovnu stranu
+	-komentari.txt: korisnikID-poruka
+	-datumiMjesto.txt: Hbegin-Mbegin-Hend-Mend-Ybegin-Yend-mjesto //ovoga uopste nema u SRS-u...
+	-posebniZahtjevi.txt: zahtjev1-zahtjev2-... //ako je jednako 0, nema nicega (po default-u se upisuje 0)
+5)kvizPitanja.txt: pitanje1-pitanje2-...-pitanje10-odgovor11-odgovor12-odgovor13-...-odgovor102-odgovor103
+6)kvizOdgovori.txt: odgovor1-odgovor2-...-odgovor10 
+7)kategorije.txt - kategorija1-kategorija2-...
