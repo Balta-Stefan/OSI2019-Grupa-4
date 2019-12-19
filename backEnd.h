@@ -27,18 +27,60 @@ struct quiz4Players
     std::string questions, answers;
 };
 
+struct eventList 
+{	//sadrzi osnovne informacije za pregled dogadjaja na glavnoj stranici
+	//slika, ostaviti za kasnije
+	std::string eventName;
+	std::string shortDescription;
+	unsigned short startHour, startMinute, endHour, endMinute, startMonth, startDay, startYear, endMonth, endDay, endYear; //informacije o pocetku i zavrsetu dogadjaja 
+	std::string location; //mjesto odrzavanja dogadjaja 
+	std::vector<std::string>specialRequirements //posebni zahtjevi dogadjaja 
+};
+
+struct eventFilter
+{	//koristi se za filtriranje dogadjaja 
+	unsigned short startHour, startMinute, endHour, endMinute, startMonth, startDay, startYear, endMonth, endDay, endYear; //informacije o pocetku i zavrsetu dogadjaja 
+	std::string location; //mjesto odrzavanja dogadjaj 
+	std::string category; 
+};
+
+struct event 
+{	//daje informacije o konkretnom dogadjaju
+
+	//dodati sliku kasnije
+	struct eventList data; //sadrzi i samu strukturu eventList
+	std::string description; //tekst koji opisuje dogadjaj
+	std::string category;
+	
+	//i-ti indeksi vektora ispod su u vezi
+	std::vector<std::string>userNames; //korisnicka imena 
+	std::vector<std::string>comments; //sadrzi komentare od korisnika iz vektora userNames
+	std::vector<std::string>commentIDs; //sadrzi identifikatore komentara
+};
+
+struct newEvent
+{	//za dodavanje novog dogadjaja 
+	struct eventList;
+	std::string description; //opis dogadjaja 
+	bool notDuplicate; //omogucava korisniku da doda dogadjaj ako se posumnja da je dogadjaj mozda vec dodan
+};
+
+
 bool authenticate(std::string sessionID);
 bool isAdmin(std::string sessionID);
 std::string login(std::string username, std::string password);
 std::string eventComment(std::string comment, std::string eventName);
 std::string banUser(std::string userName);
 struct quiz getQuizInfo();
-void editQuiz(struct quiz newQuic);
+void editQuiz(struct quiz &newQuiz);
 std::vector<std::string> getCategories();
 void changeCategories(std::vector<std::string> newCategories);
 struct quiz4Players getQuestions4Player();
-int checkPlayersAnswers(struct quiz);
+int checkPlayersAnswers(struct quiz &answers);
 std::string removeComment(std::string commentID, std::string eventName);
+struct event getEvent(std::string eventName);
+std::vector<eventList> getEvents(struct eventFilter &filter);
+std::string addEvent(struct newEvent &event2Add);
 
 
 

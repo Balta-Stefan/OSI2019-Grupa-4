@@ -74,3 +74,35 @@ std::string removeComment(std::string commentID, std::string eventName)
     //U FOLDERU eventName SE NALAZI FAJL komentari.txt
     //UKLONITI KOMENTAR U REDU SA commentID
 }
+
+
+std::vector<eventList> getEvents(struct eventFilter)
+{	
+	/*
+	prihvaca strukturu eventFilter koja daje informacije o tome sta korisnik zeli da trazi, vraca se vektor sa strukturama od kojih svaka daje informacije o nekom dogadjaju
+	*/
+}
+
+std::vector<event> getEvent(std::string eventName)
+{	
+	/*
+	prihvata sve informacije o konkretnom dogadjaju 
+	*/
+	
+}
+
+
+std::string addEvent(struct newEvent &event2Add)
+{	
+	/*
+	funkcija za dodavanje dogadjaja u bazu podataka
+	provjerava da li dogadjaj vec postoji uporedjivanjem imena i svih ostalih podataka (vrijeme, datum, mjesto i kategorija)
+	ako dogadjaj vec postoji, vratiti odgovarajucu poruku 
+	
+	povratna vrijednost je poruka o uspjesnosti
+	*/
+	
+}
+
+
+
