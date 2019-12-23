@@ -89,7 +89,6 @@ std::string addEvent(struct newEvent &event2Add);
 char genRandomChar();
 std::string genRandomString(std::string&);
 bool checkSessionID(std::string&);
-void printSessions();
 
 
 

@@ -9,7 +9,7 @@ int stringLength = sizeof(alphanum) - 1;
 
 
 std::vector<struct session> sessions;
-std::string fileOpeningError = "Greska pri otvaranju fajla.",successfulLogin="Uspjesno prijavljivanje.",unsuccessfulLogin="Neuspjesno prijavljivanje.";
+std::string fileOpeningError = "Greska,zahtjev nije moguce ispuniti.",successfulLogin="Uspjesno prijavljivanje.",unsuccessfulLogin="Neuspjesno prijavljivanje.";
 
 bool authenticate(std::string sessionID)
 {
@@ -26,7 +26,6 @@ bool isAdmin(std::string sessionID)
 std::string login(std::string username, std::string password)
 {
 	std::string fuserID, fusername, fpassword, fnumber, fline;
-	int  flag;
 	std::ifstream users("korisnici.txt");
 	if (users.is_open() == false)
 		return fileOpeningError;
@@ -40,7 +39,6 @@ std::string login(std::string username, std::string password)
 		int fnum = std::stoi(fnumber);
 		if (fusername == username && fpassword == password)
 		{
-			flag = 1;
 			std::string sessionID = "";
 			do
 			{
@@ -56,8 +54,8 @@ std::string login(std::string username, std::string password)
 		}
 
 	}
-	return unsuccessfulLogin;
 	users.close();
+	return unsuccessfulLogin;
 }
 
 std::string eventComment(std::string comment, std::string eventName)
@@ -88,9 +86,21 @@ void editQuiz(struct quiz newQuiz)
 
 std::vector<std::string> getCategories()
 {
-	//FUNKCIJA KOJA PRIBAVLJA KATEGORIJE ZA ADMINISTRATORA
-	//NALAZE SE U FAJLU kategorije.txt
-	//POPUNITI VEKTOR STRINGOVA I VRATITI GA
+	std::vector<std::string> categories;
+	std::string tmp;
+	std::ifstream fcategories("kategorije.txt");
+	if (fcategories.is_open() == false)
+	{
+		categories.push_back(fileOpeningError);
+		return categories;
+	}
+	while (!fcategories.eof())
+	{
+		std::getline(fcategories, tmp, '-');
+		categories.push_back(tmp);
+	}
+	fcategories.close();
+	return categories;
 }
 
 void changeCategories(std::vector<std::string> newCategories)
@@ -120,29 +130,29 @@ std::string removeComment(std::string commentID, std::string eventName)
 
 std::vector<eventList> getEvents(struct eventFilter)
 {
-	/*
-	prihvaca strukturu eventFilter koja daje informacije o tome sta korisnik zeli da trazi, vraca se vektor sa strukturama od kojih svaka daje informacije o nekom dogadjaju
-	*/
+	
+	//prihvaca strukturu eventFilter koja daje informacije o tome sta korisnik zeli da trazi, vraca se vektor sa strukturama od kojih svaka daje informacije o nekom dogadjaju
+	
 }
 
 struct event getEvent(std::string eventName)
 {
-	/*
-	prihvata sve informacije o konkretnom dogadjaju
-	*/
+	
+	//prihvata sve informacije o konkretnom dogadjaju
+	
 
 }
 
 
 std::string addEvent(struct newEvent &event2Add)
 {
-	/*
-	funkcija za dodavanje dogadjaja u bazu podataka
-	provjerava da li dogadjaj vec postoji uporedjivanjem imena i svih ostalih podataka (vrijeme, datum, mjesto i kategorija)
-	ako dogadjaj vec postoji, vratiti odgovarajucu poruku
+	
+	//funkcija za dodavanje dogadjaja u bazu podataka
+	//provjerava da li dogadjaj vec postoji uporedjivanjem imena i svih ostalih podataka (vrijeme, datum, mjesto i kategorija)
+	//ako dogadjaj vec postoji, vratiti odgovarajucu poruku
 
-	povratna vrijednost je poruka o uspjesnosti
-	*/
+	//povratna vrijednost je poruka o uspjesnosti
+	
 
 }
 
@@ -167,11 +177,4 @@ bool checkSessionID(std::string& sessionID)
 		if (sessionID == sessions[i].sessionID)
 			return true;
 	return false;
-}
-
-
-void printSessions()
-{
-	for(unsigned int i=0;i<sessions.size();i++)
-		std::cout << sessions[i].sessionID << " " << sessions[i].userID << " " << sessions[i].userName << " " << sessions[i].userRank << std::endl;
 }
