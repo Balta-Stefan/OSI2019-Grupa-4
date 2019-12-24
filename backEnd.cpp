@@ -9,7 +9,9 @@ int stringLength = sizeof(alphanum) - 1;
 
 
 std::vector<struct session> sessions;
-std::string fileOpeningError = "Greska,zahtjev nije moguce ispuniti.",successfulLogin="Uspjesno prijavljivanje.",unsuccessfulLogin="Neuspjesno prijavljivanje.";
+std::string fileOpeningError = "Greska,zahtjev nije moguce ispuniti.",
+successfulLogin = "Uspjesno prijavljivanje.", unsuccessfulLogin = "Neuspjesno prijavljivanje.",
+successfulBan = "Korisnik uspjesno banovan.", unsuccessfulBan = "Korisnik sa takvim imenom ne postoji.";
 
 bool authenticate(std::string sessionID)
 {
@@ -67,9 +69,40 @@ std::string eventComment(std::string comment, std::string eventName)
 
 std::string banUser(std::string userName)
 {
-	//u fajlu korisnici.txt pronaci korisnika userName
-	//promijeniti mu zadnji element u redu (broj) u nulu
-	//povratna vrijednost je poruka o uspjesnosti, koristiti neku globalnu promjenljivu
+	std::string fuserID, fusername, fpassword, fnumber, fline, fileText = "";
+	int flag=0;
+	std::ifstream users("korisnici.txt");
+	if (users.is_open() == false)
+		return fileOpeningError;
+	while (std::getline(users, fline))
+	{
+		std::stringstream iss(fline);
+		std::getline(iss, fuserID, '-');
+		std::getline(iss, fusername, '-');
+		std::getline(iss, fpassword, '-');
+		std::getline(iss, fnumber, '\n');
+		int fnum = std::stoi(fnumber);
+		if (fusername == username)
+		{
+			if (fnum == 0)
+			{
+				fnumber = "1";
+				flag = 1;
+			}
+				
+		}
+		fileText += fuserID + '-' + fusername + '-' + fpassword + '-' + fnumber + '\n';
+	}
+	users.close();
+	if (flag == 1)
+	{
+		std::ofstream users("korisnici.txt");
+		users << fileText;
+		users.close();
+		return successfulBan;
+	}
+	else
+		return unsuccessfulBan;
 }
 
 struct quiz getQuizInfo()
