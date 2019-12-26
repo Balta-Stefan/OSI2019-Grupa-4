@@ -164,7 +164,19 @@ std::vector<std::string> getCategories()
 
 void changeCategories(std::vector<std::string> newCategories)
 {
-	unsigned int i;
+	unsigned int i,j,flag=0;
+	for (i = 0; i < newCategories.size(); i++)
+	{
+		for (j = 0; j < newCategories.size(); j++)
+			if (newCategories[i] == newCategories[j])
+			{
+				flag++;
+				if (flag != 1)
+					newCategories.erase(newCategories.begin()+j);
+			}
+		flag = 0;
+
+	}
 	std::ofstream categories("kategorije.txt");
 	for (i = 0; i < newCategories.size()-1; i++)
 		categories << newCategories[i] << "-";
