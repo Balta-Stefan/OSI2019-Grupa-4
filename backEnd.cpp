@@ -57,6 +57,32 @@ std::string login(std::string username, std::string password)
 
 	}
 	users.close();
+	std::ifstream admins("admini.txt");
+	if (admins.is_open() == false)
+		return fileOpeningError;
+	while (std::getline(admins, fline))
+	{
+		std::stringstream iss(fline);
+		std::getline(iss, fuserID, '-');
+		std::getline(iss, fusername, '-');
+		std::getline(iss, fpassword, '\n');
+		if (fusername == username && fpassword == password)
+		{
+			std::string sessionID = "";
+			do
+			{
+				genRandomString(sessionID);
+			} while (checkSessionID(sessionID));
+			struct session newSession;
+			newSession.sessionID = sessionID;
+			newSession.userID = fuserID;
+			newSession.userName = fusername;
+			newSession.userRank = 1;
+			sessions.push_back(newSession);
+			return successfulLogin;
+		}
+	}
+	admins.close();
 	return unsuccessfulLogin;
 }
 
@@ -138,8 +164,11 @@ std::vector<std::string> getCategories()
 
 void changeCategories(std::vector<std::string> newCategories)
 {
-	//ADMINISTRATORKSA FUNKCIJA KOJA MIJENJA KATEGORIJE
-	//SADRZAJ VEKTORA newCategories UPISATI U FAJL kategorije.txt, CITAVOG GA IZMIJENITI
+	unsigned int i;
+	std::ofstream categories("kategorije.txt");
+	for (i = 0; i < newCategories.size()-1; i++)
+		categories << newCategories[i] << "-";
+	categories << newCategories[i];
 }
 
 struct quiz4Players getQuestions4Player()
