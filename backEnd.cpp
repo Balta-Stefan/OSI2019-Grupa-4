@@ -15,14 +15,17 @@ successfulBan = "Korisnik uspjesno banovan.", unsuccessfulBan = "Korisnik sa tak
 
 bool authenticate(std::string sessionID)
 {
-	//provjeriti da li globalni vektor zvan "sessions", koristiti for(auto &counter : sessions) petlju
-		//sadrzi sessionID pa vratiti odgovarajuci bool
-}
+	for (auto& i : sessions)
+		if (i.sessionID == sessionID)
+			return true;
+	return false;
 
 bool isAdmin(std::string sessionID)
 {
-	//isto kao funkcija authenticate, provjeriti da li je proslijedjeni sessionID od administratora
-	//povratna vrijednost je bool i false je za neuspjesno logovanje, true u protivnom
+	for (auto& i : sessions)
+		if (i.sessionID == sessionID&&i.userRank==1)
+			return true;
+	return false;
 }
 
 std::string login(std::string username, std::string password)
