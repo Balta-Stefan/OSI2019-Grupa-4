@@ -101,7 +101,7 @@ std::string eventComment(std::string comment, std::string eventName, std::string
 	comments << commentID << "-";
 	for (auto& i : sessions)
 		if (i.sessionID == sessionID)
-			comments << i.userID << "-";
+			comments << i.userName << "-";
 	comments << comment << '\n';
 	return commentAdded;
 }
@@ -209,7 +209,7 @@ int checkPlayersAnswers(struct quiz)
 
 std::string removeComment(std::string commentID, std::string eventName)
 {
-	std::string fileName = eventName + "\\komentari.txt",fline,fcommentID,fuserID,fcomment,fileText="";
+	std::string fileName = eventName + "\\komentari.txt",fline,fcommentID,fuserName,fcomment,fileText="";
 	int flag = 0;
 	std::ifstream comments(fileName);
 	if (comments.is_open() == false)
@@ -218,11 +218,11 @@ std::string removeComment(std::string commentID, std::string eventName)
 	{
 		std::stringstream iss(fline);
 		std::getline(iss, fcommentID, '-');
-		std::getline(iss, fuserID, '-');
+		std::getline(iss, fuserName, '-');
 		std::getline(iss, fcomment, '\n');
 		if (fcommentID != commentID)
 		{
-			fileText += fcommentID + "-" + fuserID + "-" + fcomment + '\n';
+			fileText += fcommentID + "-" + fuserName + "-" + fcomment + '\n';
 		}
 		else
 			flag++;
@@ -249,7 +249,62 @@ std::vector<eventList> getEvents(struct eventFilter)
 struct event getEvent(std::string eventName)
 {
 	
-	//prihvata sve informacije o konkretnom dogadjaju
+	std::ifstream longDescriptionFile(eventName + "\\opis.txt");//mozda bi trebalo provjeriti da li su svi fajlovi pravilno otvoreni
+	event requestedEvent;
+	std::string longDescription = "", shortDescription = "",fline,fcommentID,fuserName,fcomment;//ali kako signalizirati ako nisu dobro otvoreni, jer ne vraca funkcija poruku
+	while (std::getline(longDescriptionFile, fline,'\n'))
+		longDescription += fline+'\n';
+	requestedEvent.description = longDescription;
+	longDescriptionFile.close();
+	std::ifstream shortDescriptionFile(eventName + "\\kratakOpis.txt");
+	while (std::getline(shortDescriptionFile, fline))
+		shortDescription += fline + '\n';
+	requestedEvent.data.shortDescription = shortDescription;
+	shortDescriptionFile.close();
+	std::ifstream dateAndLocationFile(eventName + "\\datumiMjesto.txt");
+	std::getline(dateAndLocationFile, fline, '-');
+	requestedEvent.data.startHour = stoi(fline);
+	std::getline(dateAndLocationFile, fline, '-');
+	requestedEvent.data.startMinute = stoi(fline);
+	std::getline(dateAndLocationFile, fline, '-');
+	requestedEvent.data.endHour = stoi(fline);
+	std::getline(dateAndLocationFile, fline, '-');
+	requestedEvent.data.endMinute = stoi(fline);
+	std::getline(dateAndLocationFile, fline, '-');
+	requestedEvent.data.startDay = stoi(fline);
+	std::getline(dateAndLocationFile, fline, '-');
+	requestedEvent.data.startMonth = stoi(fline);
+	std::getline(dateAndLocationFile, fline, '-');
+	requestedEvent.data.startYear = stoi(fline);
+	std::getline(dateAndLocationFile, fline, '-');
+	requestedEvent.data.endDay = stoi(fline);
+	std::getline(dateAndLocationFile, fline, '-');
+	requestedEvent.data.endMonth = stoi(fline);
+	std::getline(dateAndLocationFile, fline, '-');
+	requestedEvent.data.endYear = stoi(fline);
+	std::getline(dateAndLocationFile, fline, '-');
+	requestedEvent.data.location= fline;
+	std::getline(dateAndLocationFile, fline, '\n');
+	requestedEvent.category = fline;
+	requestedEvent.data.eventName = eventName;
+	dateAndLocationFile.close();
+	std::ifstream specialRequirementsFile(eventName + "\\posebniZahtjevi.txt");
+	while (std::getline(specialRequirementsFile, fline, '-'))
+		requestedEvent.data.specialRequirements.push_back(fline);
+	specialRequirementsFile.close();
+	std::ifstream commentsFile(eventName + "\\komentari.txt");
+	while (std::getline(commentsFile, fline))
+	{
+		std::stringstream iss(fline);
+		std::getline(iss, fcommentID, '-');
+		std::getline(iss, fuserName, '-');
+		std::getline(iss, fcomment, '\n');
+		requestedEvent.commentIDs.push_back(fcommentID);
+		requestedEvent.comments.push_back(fcomment);
+		requestedEvent.userNames.push_back(fuserName);
+	}
+	commentsFile.close();
+	return requestedEvent;
 	
 
 }

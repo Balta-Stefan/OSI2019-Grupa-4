@@ -5,8 +5,8 @@
 	-slika
 	-opis.txt
 	-kratakOpis.txt - 1-3 recenice, za naslovnu stranu
-	-komentari.txt: komentarID-korisnikID-poruka
-	-datumiMjesto.txt: Hbegin-Mbegin-Hend-Mend-Ybegin-Yend-mjesto //ovoga uopste nema u SRS-u...
+	-komentari.txt: komentarID-korisnikIme-poruka
+	-datumiMjesto.txt: Hbegin-Mbegin-Hend-Mend-Dbegin-Mbegin-Ybegin-Dend-Mend-Yend-mjesto //ovoga uopste nema u SRS-u...
 	-posebniZahtjevi.txt: zahtjev1-zahtjev2-... //ako je jednako 0, nema nicega (po default-u se upisuje 0)
 5)kvizPitanja.txt: pitanje1-pitanje2-...-pitanje10-odgovor11-odgovor12-odgovor13-...-odgovor102-odgovor103
 6)kvizOdgovori.txt: odgovor1-odgovor2-...-odgovor10 
