@@ -11,7 +11,9 @@ int stringLength = sizeof(alphanum) - 1;
 std::vector<struct session> sessions;
 std::string fileOpeningError = "Greska,zahtjev nije moguce ispuniti.",
 successfulLogin = "Uspjesno prijavljivanje.", unsuccessfulLogin = "Neuspjesno prijavljivanje.",
-successfulBan = "Korisnik uspjesno banovan.", unsuccessfulBan = "Korisnik sa takvim imenom ne postoji.";
+successfulBan = "Korisnik uspjesno banovan.", unsuccessfulBan = "Korisnik sa takvim imenom ne postoji."
+commentAdded = "Komentar uspjesno dodan.",
+unsuccessfulComment = "Neuspjesno brisanje komentara.", successfulComment="Komentar uspjesno obrisan.";
 
 bool authenticate(std::string sessionID)
 {
@@ -89,11 +91,19 @@ std::string login(std::string username, std::string password)
 	return unsuccessfulLogin;
 }
 
-std::string eventComment(std::string comment, std::string eventName)
+std::string eventComment(std::string comment, std::string eventName, std::string sessionID)
 {
-	//staviti komentar comment u dogadjaj sa nazivom eventName
-	//voditi racuna o formatu u fajlu komentari.txt
-	//povratna vrijednost je poruka o uspjesnosti, koristiti neku globalnu promjenljivu
+	std::string fileName = eventName + "\\komentari.txt", commentID="";
+	std::fstream comments(fileName,std::ios::app);
+	if (!comments)
+		return fileOpeningError;
+	genRandomString(commentID);
+	comments << commentID << "-";
+	for (auto& i : sessions)
+		if (i.sessionID == sessionID)
+			comments << i.userID << "-";
+	comments << comment << '\n';
+	return commentAdded;
 }
 
 std::string banUser(std::string userName)
@@ -199,9 +209,33 @@ int checkPlayersAnswers(struct quiz)
 
 std::string removeComment(std::string commentID, std::string eventName)
 {
-	//ADMINISTRATORSKA FUNKCIJA ZA UKLANJANJE KOMENTARA
-	//U FOLDERU eventName SE NALAZI FAJL komentari.txt
-	//UKLONITI KOMENTAR U REDU SA commentID
+	std::string fileName = eventName + "\\komentari.txt",fline,fcommentID,fuserID,fcomment,fileText="";
+	int flag = 0;
+	std::ifstream comments(fileName);
+	if (comments.is_open() == false)
+		return fileOpeningError;
+	while (std::getline(comments, fline))
+	{
+		std::stringstream iss(fline);
+		std::getline(iss, fcommentID, '-');
+		std::getline(iss, fuserID, '-');
+		std::getline(iss, fcomment, '\n');
+		if (fcommentID != commentID)
+		{
+			fileText += fcommentID + "-" + fuserID + "-" + fcomment + '\n';
+		}
+		else
+			flag++;
+	}
+	if (flag != 1)
+		return unsuccessfulComment;
+	comments.close();
+	std::ofstream commentsInput(fileName);
+	if (commentsInput.is_open() == false)
+		return fileOpeningError;
+	commentsInput<< fileText;
+	commentsInput.close();
+	return successfulComment;
 }
 
 

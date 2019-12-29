@@ -74,7 +74,7 @@ struct newEvent
 bool authenticate(std::string sessionID);
 bool isAdmin(std::string sessionID);
 std::string login(std::string username, std::string password);
-std::string eventComment(std::string comment, std::string eventName);
+std::string eventComment(std::string comment, std::string eventName, std::string sessionID);
 std::string banUser(std::string userName);
 struct quiz getQuizInfo();
 void editQuiz(struct quiz &newQuiz);
