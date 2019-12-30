@@ -11,7 +11,7 @@ int stringLength = sizeof(alphanum) - 1;
 std::vector<struct session> sessions;
 std::string fileOpeningError = "Greska,zahtjev nije moguce ispuniti.",
 successfulLogin = "Uspjesno prijavljivanje.", unsuccessfulLogin = "Neuspjesno prijavljivanje.",
-successfulBan = "Korisnik uspjesno banovan.", unsuccessfulBan = "Korisnik sa takvim imenom ne postoji."
+successfulBan = "Korisnik uspjesno banovan.", unsuccessfulBan = "Korisnik sa takvim imenom ne postoji.",
 commentAdded = "Komentar uspjesno dodan.",
 unsuccessfulComment = "Neuspjesno brisanje komentara.", successfulComment="Komentar uspjesno obrisan.";
 
@@ -21,7 +21,7 @@ bool authenticate(std::string sessionID)
 		if (i.sessionID == sessionID)
 			return true;
 	return false;
-
+}
 bool isAdmin(std::string sessionID)
 {
 	for (auto& i : sessions)
@@ -121,7 +121,7 @@ std::string banUser(std::string userName)
 		std::getline(iss, fpassword, '-');
 		std::getline(iss, fnumber, '\n');
 		int fnum = std::stoi(fnumber);
-		if (fusername == username)
+		if (fusername == userName)
 		{
 			if (fnum == 0)
 			{
