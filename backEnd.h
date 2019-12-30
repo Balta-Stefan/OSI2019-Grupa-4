@@ -66,6 +66,7 @@ struct event
 struct newEvent
 {	//za dodavanje novog dogadjaja 
 	struct eventList;
+	std::string category;
 	std::string description; //opis dogadjaja 
 	bool notDuplicate; //omogucava korisniku da doda dogadjaj ako se posumnja da je dogadjaj mozda vec dodan
 };
