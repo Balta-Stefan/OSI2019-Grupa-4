@@ -227,7 +227,15 @@ void changeCategories(std::vector<std::string> newCategories)
 
 struct quiz4Players getQuestions4Player()
 {
-	//FUNKCIJA KOJA PRIBAVLJA PITANJA I PONUDJENE ODGOVORE ZA IGRACE
+	struct quiz quizInfo;
+	struct quiz4Players quizForPlayers;
+	quizInfo = getQuizInfo();
+	int i;
+	for (i = 0; i < 10; i++)
+		quizForPlayers.questions.push_back(quizInfo.questions[i]);
+	for (i = 0; i < 30; i++)
+		quizForPlayers.answers.push_back(quizInfo.answers[i]);
+	return quizForPlayers;
 }
 
 int checkPlayersAnswers(struct quiz)
