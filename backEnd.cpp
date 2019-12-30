@@ -146,9 +146,38 @@ std::string banUser(std::string userName)
 
 struct quiz getQuizInfo()
 {
-	//POPUNITI STRUKTURU STRUCT QUIZ
-	//ovo je funkcija koja pribavlja podatke o kvizu za administratora
-	//vratiti tu popunjenu strukturu
+	struct quiz quizinfo;
+	std::string question, answer, line;
+	std::ifstream quizquestions("kvizPitanja.txt");
+	std::getline(quizquestions, line);
+	int i, k;
+	std::stringstream iss(line);
+	for (i = 0; i < 10; i++)
+	{
+		std::getline(iss, question, '-');
+		quizinfo.questions.push_back(question);
+	}
+	for (k = 0; k < 30; k++)
+	{
+		if (k == 29) std::getline(iss, answer, '\n');
+		else std::getline(iss, answer, '-');
+		quizinfo.answers.push_back(answer);
+	}
+	quizquestions.close();
+	std::ifstream quizanswers("kvizOdgovori.txt");
+	std::getline(quizanswers, line);
+	std::stringstream iss2(line);
+	for (i = 0; i < 10; i++)
+	{
+		if (i == 9)
+			std::getline(iss2, answer, '\n');
+		else
+			std::getline(iss2, answer, '-');
+		for (k = 3 * i; k < 3 * i + 3; k++)
+			if (quizinfo.answers[k] == answer)
+				quizinfo.rightAnswers.push_back(k);
+	}
+	return quizinfo;
 }
 
 void editQuiz(struct quiz newQuiz)

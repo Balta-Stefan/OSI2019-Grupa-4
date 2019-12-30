@@ -23,13 +23,13 @@ struct session
 
 struct quiz
 {
-	std::string questions, answers;
+	std::vector<std::string> questions, answers;
 	std::vector<int> rightAnswers;
 };
 
 struct quiz4Players
 {
-	std::string questions, answers;
+	std::vector<std::string> questions, answers;
 };
 
 struct eventList
