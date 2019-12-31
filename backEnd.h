@@ -82,7 +82,7 @@ void editQuiz(struct quiz &newQuiz);
 std::vector<std::string> getCategories();
 void changeCategories(std::vector<std::string> newCategories);
 struct quiz4Players getQuestions4Player();
-int checkPlayersAnswers(struct quiz &answers);
+int checkPlayersAnswers(struct quiz &playerQandA);
 std::string removeComment(std::string commentID, std::string eventName);
 struct event getEvent(std::string eventName);
 std::vector<eventList> getEvents(struct eventFilter &filter);

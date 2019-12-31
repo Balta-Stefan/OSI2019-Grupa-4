@@ -180,9 +180,26 @@ struct quiz getQuizInfo()
 	return quizinfo;
 }
 
-void editQuiz(struct quiz newQuiz)
+void editQuiz(struct quiz &newQuiz)
 {
-	//FUNKCIJA ZA ADMINISTRATORA, KORISTI SE ZA PROMJENU KVIZA
+	int i;
+	std::ofstream quizQuestions("kvizPitanja.txt");
+	for (i = 0; i < 10; i++)
+		quizQuestions << newQuiz.questions[i] << "-";
+	for (i = 0; i < 30; i++)
+		if (i == 29)
+			quizQuestions << newQuiz.answers[i] << "\n";
+		else
+			quizQuestions << newQuiz.answers[i] << "-";
+	quizQuestions.close();
+	std::ofstream quizAnswers("kvizOdgovori.txt");
+	for (i = 0; i < 10; i++)
+		if (i == 9)
+			quizAnswers << newQuiz.answers[newQuiz.rightAnswers[i]] << "\n";
+		else
+			quizAnswers << newQuiz.answers[newQuiz.rightAnswers[i]] << "-";
+	quizAnswers.close();
+	
 }
 
 std::vector<std::string> getCategories()
