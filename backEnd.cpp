@@ -257,8 +257,19 @@ struct quiz4Players getQuestions4Player()
 
 int checkPlayersAnswers(struct quiz)
 {
-	//FUNKCIJA KOJA PROVJERAVA KOLIKO JE ODGOVORA ISPRAVNO
-	//VRATITI BROJ ISPRAVNIH ODGOVORA
+	int k = 0, numOfCorrectAnswers = 0;
+	struct quiz quizInfo = getQuizInfo();
+	for (int i = 0; i < 10; i++)
+	{
+		while (playerQandA.questions[i] != quizInfo.questions[k])
+			k++;
+		if (playerQandA.answers[i] == quizInfo.answers[quizInfo.rightAnswers[k]]) numOfCorrectAnswers++;
+		k = 0;
+
+	}
+	return numOfCorrectAnswers;
+	
+	//STRUKTURA playerQandA sadrzi samo pitanja i odgovore KORISNIKA,dok vektor rightAnswers ostaje prazan i zanemaruje se
 }
 
 std::string removeComment(std::string commentID, std::string eventName)
