@@ -10,7 +10,7 @@ int stringLength = sizeof(alphanum) - 1;
 
 std::vector<struct session> sessions;
 std::string fileOpeningError = "Greska,zahtjev nije moguce ispuniti.",
-successfulLogin = "Uspjesno prijavljivanje.", unsuccessfulLogin = "Neuspjesno prijavljivanje.",
+successfulLogin = "Uspjesno prijavljivanje.", unsuccessfulLogin = "Neuspjesno prijavljivanje.", userBanned="Ovaj nalog je banovan.",
 successfulBan = "Korisnik uspjesno banovan.", unsuccessfulBan = "Korisnik sa takvim imenom ne postoji.",
 commentAdded = "Komentar uspjesno dodan.",
 unsuccessfulComment = "Neuspjesno brisanje komentara.", successfulComment="Komentar uspjesno obrisan.",successfulLogOut="Uspjesno odjavljivanje.",
@@ -48,6 +48,8 @@ std::string login(std::string username, std::string password)
 		int fnum = std::stoi(fnumber);
 		if (fusername == username && fpassword == password)
 		{
+			if (fnum == 1)
+				return userBanned;
 			std::string sessionID;
 			do
 			{
@@ -263,7 +265,7 @@ struct quiz4Players getQuestions4Player()
 	return quizForPlayers;
 }
 
-int checkPlayersAnswers(struct quiz playerQandA)
+int checkPlayersAnswers(struct quiz &playerQandA)
 {
 	int k = 0, numOfCorrectAnswers = 0;
 	struct quiz quizInfo = getQuizInfo();
@@ -312,7 +314,7 @@ std::string removeComment(std::string commentID, std::string eventName)
 }
 
 
-std::vector<eventList> getEvents(struct eventFilter)
+std::vector<eventList> getEvents(struct eventFilter filter)
 {
 	
 	//prihvaca strukturu eventFilter koja daje informacije o tome sta korisnik zeli da trazi, vraca se vektor sa strukturama od kojih svaka daje informacije o nekom dogadjaju
