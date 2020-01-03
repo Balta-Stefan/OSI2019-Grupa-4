@@ -7,6 +7,7 @@
 #include <fstream>
 #include <ctime>
 #include <cstdlib>
+#include <Windows.h>
 
 //global variable: vector<struct session> sessions
 
@@ -65,14 +66,14 @@ struct event
 
 struct newEvent
 {	//za dodavanje novog dogadjaja 
-	struct eventList;
+	struct eventList eventList;
 	std::string category;
 	std::string description; //opis dogadjaja 
 	bool notDuplicate; //omogucava korisniku da doda dogadjaj ako se posumnja da je dogadjaj mozda vec dodan
 };
 
 
-bool authenticate(std::string sessionID);
+session* authenticate(std::string sessionID);
 bool isAdmin(std::string sessionID);
 std::string login(std::string username, std::string password);
 std::string eventComment(std::string comment, std::string eventName, std::string sessionID);
@@ -86,11 +87,12 @@ int checkPlayersAnswers(struct quiz &playerQandA);
 std::string removeComment(std::string commentID, std::string eventName);
 struct event getEvent(std::string eventName);
 std::vector<eventList> getEvents(struct eventFilter &filter);
-std::string addEvent(struct newEvent &event2Add);
+std::string addEvent(struct newEvent &event2Add, std::string sessionID);
 char genRandomChar();
 std::string genRandomString(std::string&);
 bool checkSessionID(std::string&);
 std::string logOut(std::string sessionID);
+bool checkCommentID(std::string&, std::string&);
 
 
 

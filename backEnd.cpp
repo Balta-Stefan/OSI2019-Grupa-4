@@ -14,14 +14,15 @@ successfulLogin = "Uspjesno prijavljivanje.", unsuccessfulLogin = "Neuspjesno pr
 successfulBan = "Korisnik uspjesno banovan.", unsuccessfulBan = "Korisnik sa takvim imenom ne postoji.",
 commentAdded = "Komentar uspjesno dodan.",
 unsuccessfulComment = "Neuspjesno brisanje komentara.", successfulComment="Komentar uspjesno obrisan.",successfulLogOut="Uspjesno odjavljivanje.",
-unsuccessfulLogOut="Neuspjesno odjavljivanje.";
+unsuccessfulLogOut="Neuspjesno odjavljivanje.",
+successfulEvent="Dogadjaj uspjesno dodan.",alreadyExistingEvent="Dogadjaj sa ovim imenom vec postoji.";
 
-bool authenticate(std::string sessionID)
+session* authenticate(std::string sessionID)
 {
 	for (auto& i : sessions)
 		if (i.sessionID == sessionID)
-			return true;
-	return false;
+			return &i;
+	return nullptr;
 }
 bool isAdmin(std::string sessionID)
 {
@@ -47,9 +48,10 @@ std::string login(std::string username, std::string password)
 		int fnum = std::stoi(fnumber);
 		if (fusername == username && fpassword == password)
 		{
-			std::string sessionID = "";
+			std::string sessionID;
 			do
 			{
+				sessionID="";
 				genRandomString(sessionID);
 			} while (checkSessionID(sessionID));
 			struct session newSession;
@@ -74,9 +76,10 @@ std::string login(std::string username, std::string password)
 		std::getline(iss, fpassword, '\n');
 		if (fusername == username && fpassword == password)
 		{
-			std::string sessionID = "";
+			std::string sessionID ;
 			do
 			{
+				sessionID="";
 				genRandomString(sessionID);
 			} while (checkSessionID(sessionID));
 			struct session newSession;
@@ -98,7 +101,11 @@ std::string eventComment(std::string comment, std::string eventName, std::string
 	std::fstream comments(fileName,std::ios::app);
 	if (!comments)
 		return fileOpeningError;
-	genRandomString(commentID);
+	do
+	{
+		commentID = "";
+		genRandomString(commentID);
+	} while (!checkCommentID(commentID,eventName));
 	comments << commentID << "-";
 	for (auto& i : sessions)
 		if (i.sessionID == sessionID)
@@ -256,7 +263,7 @@ struct quiz4Players getQuestions4Player()
 	return quizForPlayers;
 }
 
-int checkPlayersAnswers(struct quiz)
+int checkPlayersAnswers(struct quiz playerQandA)
 {
 	int k = 0, numOfCorrectAnswers = 0;
 	struct quiz quizInfo = getQuizInfo();
@@ -393,14 +400,55 @@ struct event getEvent(std::string eventName)
 }
 
 
-std::string addEvent(struct newEvent &event2Add)
+std::string addEvent(struct newEvent &event2Add, std::string sessionID)
 {
-	
-	//funkcija za dodavanje dogadjaja u bazu podataka
-	//provjerava da li dogadjaj vec postoji uporedjivanjem imena i svih ostalih podataka (vrijeme, datum, mjesto i kategorija)
-	//ako dogadjaj vec postoji, vratiti odgovarajucu poruku
-
-	//povratna vrijednost je poruka o uspjesnosti
+	std::ifstream userEvent("korisnikDogadjaj.txt");
+	if (userEvent.is_open() == false)
+		return fileOpeningError;
+	std::string fline, fuserID, fevent;
+	int flag = 0;
+	while (std::getline(userEvent, fline))
+	{
+		std::stringstream iss(fline);
+		std::getline(iss, fevent, '-');
+		std::getline(iss, fuserID, '\n');
+		if(fevent==event2Add.eventList.eventName)
+			flag++;
+	}
+	if (flag != 0)
+		return alreadyExistingEvent;
+	userEvent.close();
+	CreateDirectoryA((LPCSTR)event2Add.eventList.eventName.c_str(), NULL);
+	std::ofstream dateAndLocation(event2Add.eventList.eventName+"\\datumiMjesto.txt");
+	if (dateAndLocation.is_open() == false)
+		return fileOpeningError;
+	dateAndLocation << event2Add.eventList.startHour << "-" << event2Add.eventList.startMinute << "-" << event2Add.eventList.endHour << "-" << event2Add.eventList.endMinute << "-"
+	<< event2Add.eventList.startDay << "-" << event2Add.eventList.startMonth << "-" << event2Add.eventList.startYear << "-"
+	<< event2Add.eventList.endDay << "-" << event2Add.eventList.endMonth << "-" << event2Add.eventList.endYear << "-"
+	<< event2Add.eventList.location << "-" << event2Add.category << "\n";
+	dateAndLocation.close();
+	std::fstream userEvent2("korisnikDogadjaj.txt",std::ios::app);
+	if (userEvent2.is_open() == false)
+		return fileOpeningError;
+	session* session = authenticate(sessionID);
+	userEvent2 << event2Add.eventList.eventName << "-" << (*session).userID << '\n';
+	userEvent2.close();
+	std::ofstream shortDescription(event2Add.eventList.eventName + "\\kratakOpis.txt");
+	if (shortDescription.is_open() == false)
+		return fileOpeningError;
+	shortDescription << event2Add.eventList.shortDescription;
+	shortDescription.close();
+	std::ofstream longDescription(event2Add.eventList.eventName + "\\opis.txt");
+	if (longDescription.is_open() == false)
+		return fileOpeningError;
+	longDescription << event2Add.description;
+	longDescription.close();
+	std::ofstream specialRequests(event2Add.eventList.eventName+"\\posebniZahtjevi.txt");
+	if (specialRequests.is_open() == false)
+		return fileOpeningError;
+	for (auto& i : event2Add.eventList.specialRequirements)
+		specialRequests << i << "-";
+	return successfulEvent;
 	
 
 }
@@ -413,6 +461,7 @@ char genRandomChar()  // Funkcija za generisanje random stringa.
 
 std::string genRandomString(std::string& sessionID)
 {
+	srand((unsigned)time(NULL));
 	for (int z = 0; z < 32; z++)
 	{
 		sessionID += genRandomChar();
@@ -430,7 +479,7 @@ bool checkSessionID(std::string& sessionID)
 
 std::string logOut(std::string sessionID)
 {
-	int i;
+	unsigned i;
 	for (i = 0; i < sessions.size(); i++)
 		if (sessions[i].sessionID == sessionID)
 		{
@@ -439,4 +488,21 @@ std::string logOut(std::string sessionID)
 			return successfulLogOut;
 		}
 	return unsuccessfulLogOut;
+}
+
+bool checkCommentID(std::string& commentID, std::string& eventName)
+{
+	std::ifstream commentsFile(eventName + "\\komentari.txt");
+	std:: string fline, fcommentID, fuserName, fcomment;
+	while (std::getline(commentsFile, fline))
+	{
+		std::stringstream iss(fline);
+		std::getline(iss, fcommentID, '-');
+		std::getline(iss, fuserName, '-');
+		std::getline(iss, fcomment, '\n');
+		if (fcommentID == commentID)
+			return false;
+	}
+	commentsFile.close();
+	return true;
 }
