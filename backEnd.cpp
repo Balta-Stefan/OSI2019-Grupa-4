@@ -13,7 +13,8 @@ std::string fileOpeningError = "Greska,zahtjev nije moguce ispuniti.",
 successfulLogin = "Uspjesno prijavljivanje.", unsuccessfulLogin = "Neuspjesno prijavljivanje.",
 successfulBan = "Korisnik uspjesno banovan.", unsuccessfulBan = "Korisnik sa takvim imenom ne postoji.",
 commentAdded = "Komentar uspjesno dodan.",
-unsuccessfulComment = "Neuspjesno brisanje komentara.", successfulComment="Komentar uspjesno obrisan.";
+unsuccessfulComment = "Neuspjesno brisanje komentara.", successfulComment="Komentar uspjesno obrisan.",successfulLogOut="Uspjesno odjavljivanje.",
+unsuccessfulLogOut="Neuspjesno odjavljivanje.";
 
 bool authenticate(std::string sessionID)
 {
@@ -408,4 +409,17 @@ bool checkSessionID(std::string& sessionID)
 		if (sessionID == sessions[i].sessionID)
 			return true;
 	return false;
+}
+
+std::string logOut(std::string sessionID)
+{
+	int i;
+	for (i = 0; i < sessions.size(); i++)
+		if (sessions[i].sessionID == sessionID)
+		{
+			std::vector<struct session>::iterator it = sessions.begin() + i;
+			sessions.erase(it);
+			return successfulLogOut;
+		}
+	return unsuccessfulLogOut;
 }
