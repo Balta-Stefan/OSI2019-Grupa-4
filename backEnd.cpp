@@ -302,10 +302,27 @@ std::vector<eventList> getEvents(struct eventFilter)
 
 struct event getEvent(std::string eventName)
 {
-	
+	std::ifstream userEvent("korisnikDogadjaj.txt");
+	std::string fline,fuserID,fevent;
+	int flag=0;
+	while (std::getline(userEvent, fline))
+	{
+		std::stringstream iss(fline);
+		std::getline(iss, fevent, '-');
+		std::getline(iss, fuserID, '\n');
+		if (fevent == eventName)
+			flag++;
+	}
+	if (flag == 0)
+	{
+		event emptyEvent;
+		emptyEvent.category = "";
+		return emptyEvent;
+	}
+	userEvent.close();
 	std::ifstream longDescriptionFile(eventName + "\\opis.txt");//mozda bi trebalo provjeriti da li su svi fajlovi pravilno otvoreni
 	event requestedEvent;
-	std::string longDescription = "", shortDescription = "",fline,fcommentID,fuserName,fcomment;//ali kako signalizirati ako nisu dobro otvoreni, jer ne vraca funkcija poruku
+	std::string longDescription = "", shortDescription = "",fcommentID,fuserName,fcomment;//ali kako signalizirati ako nisu dobro otvoreni, jer ne vraca funkcija poruku
 	while (std::getline(longDescriptionFile, fline,'\n'))
 		longDescription += fline+'\n';
 	requestedEvent.description = longDescription;
