@@ -269,7 +269,7 @@ int checkPlayersAnswers(struct quiz &playerQandA)
 {
 	int k = 0, numOfCorrectAnswers = 0;
 	struct quiz quizInfo = getQuizInfo();
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		while (playerQandA.questions[i] != quizInfo.questions[k])
 			k++;
