@@ -47,7 +47,6 @@ struct eventList
 struct eventsFilter
 {
 	bool todayEvents, futureEvents, pastEvents;
-	std::string location;
 	std::string category;
 };
 

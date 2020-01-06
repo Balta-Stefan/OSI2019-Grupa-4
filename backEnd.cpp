@@ -500,7 +500,6 @@ bool checkCommentID(std::string& commentID, std::string& eventName)
 	commentsFile.close();
 	return true;
 }
-
 std::vector<event> getFilteredEvents(struct eventsFilter &filter)
 {
 
@@ -512,7 +511,9 @@ std::vector<event> getFilteredEvents(struct eventsFilter &filter)
 	struct tm currentDate;
 	time_t now = time(0);
 	localtime_s(&currentDate, &now);
-	if (filter.todayEvents)
+	if (!filter.pastEvents && !filter.futureEvents && filter.category == "" && !filter.todayEvents)
+		return events;
+	else if (!filter.pastEvents && !filter.futureEvents && filter.category=="")
 	{
 		while (std::getline(userEventFile, fline))
 		{
@@ -524,7 +525,7 @@ std::vector<event> getFilteredEvents(struct eventsFilter &filter)
 				events.push_back(tmp);
 		}
 	}
-	else if (filter.category != "")
+	else if (!filter.futureEvents && !filter.pastEvents && !filter.todayEvents)
 	{
 		while (std::getline(userEventFile, fline))
 		{
@@ -536,19 +537,7 @@ std::vector<event> getFilteredEvents(struct eventsFilter &filter)
 				events.push_back(tmp);
 		}
 	}
-	else if (filter.location != "")
-	{
-		while (std::getline(userEventFile, fline))
-		{
-			std::stringstream iss(fline);
-			std::getline(iss, feventName, '-');
-			std::getline(iss, fuserID, '\n');
-			tmp = getEvent(feventName);
-			if (tmp.data.location == filter.location)
-				events.push_back(tmp);
-		}
-	}
-	else if (filter.futureEvents)
+	else if (!filter.pastEvents && !filter.todayEvents && filter.category=="")
 	{
 		while (std::getline(userEventFile, fline))
 		{
@@ -562,7 +551,7 @@ std::vector<event> getFilteredEvents(struct eventsFilter &filter)
 				events.push_back(tmp);
 		}
 	}
-	else if (filter.pastEvents)
+	else if (!filter.futureEvents && !filter.todayEvents && filter.category=="")
 	{
 		while (std::getline(userEventFile, fline))
 		{
@@ -573,6 +562,155 @@ std::vector<event> getFilteredEvents(struct eventsFilter &filter)
 			if (tmp.data.startYear < currentDate.tm_year + 1900 ||
 				tmp.data.startYear == currentDate.tm_year + 1900 && tmp.data.startMonth < currentDate.tm_mon + 1 ||
 				tmp.data.startYear == currentDate.tm_year + 1900 && tmp.data.startMonth == currentDate.tm_mon + 1 && tmp.data.startDay < currentDate.tm_mday)
+				events.push_back(tmp);
+		}
+	}
+	else if (filter.pastEvents && filter.futureEvents && filter.todayEvents && filter.category!="")
+	{
+		while (std::getline(userEventFile, fline))
+		{
+			std::stringstream iss(fline);
+			std::getline(iss, feventName, '-');
+			std::getline(iss, fuserID, '\n');
+			tmp = getEvent(feventName);
+			if(tmp.category==filter.category)
+				events.push_back(tmp);
+		}
+	}
+	else if (filter.pastEvents && filter.futureEvents && filter.category != "")
+	{
+		while (std::getline(userEventFile, fline))
+		{
+			std::stringstream iss(fline);
+			std::getline(iss, feventName, '-');
+			std::getline(iss, fuserID, '\n');
+			tmp = getEvent(feventName);
+			if ((tmp.data.startDay != currentDate.tm_mday && tmp.data.startMonth != currentDate.tm_mon + 1 && tmp.data.startYear != currentDate.tm_year + 1900) &&
+				tmp.category == filter.category)
+				events.push_back(tmp);
+		}
+	}
+	else if (filter.pastEvents && filter.futureEvents && filter.todayEvents)
+	{
+		while (std::getline(userEventFile, fline))
+		{
+			std::stringstream iss(fline);
+			std::getline(iss, feventName, '-');
+			std::getline(iss, fuserID, '\n');
+			tmp = getEvent(feventName);
+			events.push_back(tmp);
+		}
+	}
+	else if (filter.todayEvents && filter.pastEvents && filter.category!="")
+	{
+		while (std::getline(userEventFile, fline))
+		{
+			std::stringstream iss(fline);
+			std::getline(iss, feventName, '-');
+			std::getline(iss, fuserID, '\n');
+			tmp = getEvent(feventName);
+			if ((tmp.data.startYear < currentDate.tm_year + 1900 ||
+				tmp.data.startYear == currentDate.tm_year + 1900 && tmp.data.startMonth < currentDate.tm_mon + 1 ||
+				tmp.data.startYear == currentDate.tm_year + 1900 && tmp.data.startMonth == currentDate.tm_mon + 1 && tmp.data.startDay <= currentDate.tm_mday) &&
+				tmp.category == filter.category)
+				events.push_back(tmp);
+		}
+	}
+	else if (filter.todayEvents && filter.futureEvents && filter.category!="")
+	{
+		while (std::getline(userEventFile, fline))
+		{
+			std::stringstream iss(fline);
+			std::getline(iss, feventName, '-');
+			std::getline(iss, fuserID, '\n');
+			tmp = getEvent(feventName);
+			if ((tmp.data.startYear > currentDate.tm_year + 1900 ||
+				tmp.data.startYear == currentDate.tm_year + 1900 && tmp.data.startMonth > currentDate.tm_mon + 1 ||
+				tmp.data.startYear == currentDate.tm_year + 1900 && tmp.data.startMonth == currentDate.tm_mon + 1 && tmp.data.startDay >= currentDate.tm_mday) &&
+				tmp.category == filter.category)
+				events.push_back(tmp);
+		}
+	}
+	else if (filter.pastEvents && filter.category != "")
+	{
+		while (std::getline(userEventFile, fline))
+		{
+			std::stringstream iss(fline);
+			std::getline(iss, feventName, '-');
+			std::getline(iss, fuserID, '\n');
+			tmp = getEvent(feventName);
+			if ((tmp.data.startYear < currentDate.tm_year + 1900 ||
+				tmp.data.startYear == currentDate.tm_year + 1900 && tmp.data.startMonth < currentDate.tm_mon + 1 ||
+				tmp.data.startYear == currentDate.tm_year + 1900 && tmp.data.startMonth == currentDate.tm_mon + 1 && tmp.data.startDay < currentDate.tm_mday) &&
+				tmp.category == filter.category)
+				events.push_back(tmp);
+		}
+	}
+	else if (filter.futureEvents && filter.category != "")
+	{
+		while (std::getline(userEventFile, fline))
+		{
+			std::stringstream iss(fline);
+			std::getline(iss, feventName, '-');
+			std::getline(iss, fuserID, '\n');
+			tmp = getEvent(feventName);
+			if ((tmp.data.startYear > currentDate.tm_year + 1900 ||
+				tmp.data.startYear == currentDate.tm_year + 1900 && tmp.data.startMonth > currentDate.tm_mon + 1 ||
+				tmp.data.startYear == currentDate.tm_year + 1900 && tmp.data.startMonth == currentDate.tm_mon + 1 && tmp.data.startDay > currentDate.tm_mday) &&
+				tmp.category == filter.category)
+				events.push_back(tmp);
+		}
+	}
+	if (filter.todayEvents && filter.category != "")
+	{
+		while (std::getline(userEventFile, fline))
+		{
+			std::stringstream iss(fline);
+			std::getline(iss, feventName, '-');
+			std::getline(iss, fuserID, '\n');
+			tmp = getEvent(feventName);
+			if ((tmp.data.startDay == currentDate.tm_mday && tmp.data.startMonth == currentDate.tm_mon + 1 && tmp.data.startYear == currentDate.tm_year + 1900) &&
+				tmp.category==filter.category)
+				events.push_back(tmp);
+		}
+	}
+	else if (filter.todayEvents && filter.pastEvents)
+	{
+		while (std::getline(userEventFile, fline))
+		{
+			std::stringstream iss(fline);
+			std::getline(iss, feventName, '-');
+			std::getline(iss, fuserID, '\n');
+			tmp = getEvent(feventName);
+			if (tmp.data.startYear < currentDate.tm_year + 1900 ||
+				tmp.data.startYear == currentDate.tm_year + 1900 && tmp.data.startMonth < currentDate.tm_mon + 1 ||
+				tmp.data.startYear == currentDate.tm_year + 1900 && tmp.data.startMonth == currentDate.tm_mon + 1 && tmp.data.startDay <= currentDate.tm_mday)
+				events.push_back(tmp);
+		}
+	}
+	else if (filter.todayEvents && filter.futureEvents)
+	{
+		while (std::getline(userEventFile, fline))
+		{
+			std::stringstream iss(fline);
+			std::getline(iss, feventName, '-');
+			std::getline(iss, fuserID, '\n');
+			tmp = getEvent(feventName);
+			if (tmp.data.startYear > currentDate.tm_year + 1900 ||
+				tmp.data.startYear == currentDate.tm_year + 1900 && tmp.data.startMonth > currentDate.tm_mon + 1 ||
+				tmp.data.startYear == currentDate.tm_year + 1900 && tmp.data.startMonth == currentDate.tm_mon + 1 && tmp.data.startDay >= currentDate.tm_mday)
+				events.push_back(tmp);
+		}
+	}
+	else if (filter.pastEvents && filter.futureEvents)
+	{
+		while (std::getline(userEventFile, fline))
+		{
+			std::stringstream iss(fline);
+			std::getline(iss, feventName, '-');
+			std::getline(iss, fuserID, '\n');
+			tmp = getEvent(feventName);
+			if (tmp.data.startDay != currentDate.tm_mday || tmp.data.startMonth != currentDate.tm_mon + 1 || tmp.data.startYear != currentDate.tm_year + 1900)
 				events.push_back(tmp);
 		}
 	}
