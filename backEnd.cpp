@@ -313,14 +313,6 @@ std::string removeComment(std::string commentID, std::string eventName)
 	return successfulComment;
 }
 
-
-std::vector<eventList> getEvents(struct eventFilter filter)
-{
-	
-	//prihvaca strukturu eventFilter koja daje informacije o tome sta korisnik zeli da trazi, vraca se vektor sa strukturama od kojih svaka daje informacije o nekom dogadjaju
-	
-}
-
 struct event getEvent(std::string eventName)
 {
 	std::ifstream userEvent("korisnikDogadjaj.txt");
@@ -507,4 +499,83 @@ bool checkCommentID(std::string& commentID, std::string& eventName)
 	}
 	commentsFile.close();
 	return true;
+}
+
+std::vector<event> getFilteredEvents(struct eventsFilter &filter)
+{
+
+	//prihvaca strukturu eventFilter koja daje informacije o tome sta korisnik zeli da trazi, vraca se vektor sa strukturama od kojih svaka daje informacije o nekom dogadjaju
+	std::ifstream userEventFile("korisnikDogadjaj.txt");
+	std::string fline, feventName, fuserID;
+	std::vector<event> events;
+	event tmp;
+	struct tm currentDate;
+	time_t now = time(0);
+	localtime_s(&currentDate, &now);
+	if (filter.todayEvents)
+	{
+		while (std::getline(userEventFile, fline))
+		{
+			std::stringstream iss(fline);
+			std::getline(iss, feventName, '-');
+			std::getline(iss, fuserID, '\n');
+			tmp = getEvent(feventName);
+			if (tmp.data.startDay==currentDate.tm_mday && tmp.data.startMonth==currentDate.tm_mon+1 && tmp.data.startYear==currentDate.tm_year+1900)
+				events.push_back(tmp);
+		}
+	}
+	else if (filter.category != "")
+	{
+		while (std::getline(userEventFile, fline))
+		{
+			std::stringstream iss(fline);
+			std::getline(iss, feventName, '-');
+			std::getline(iss, fuserID, '\n');
+			tmp = getEvent(feventName);
+			if (tmp.category == filter.category)
+				events.push_back(tmp);
+		}
+	}
+	else if (filter.location != "")
+	{
+		while (std::getline(userEventFile, fline))
+		{
+			std::stringstream iss(fline);
+			std::getline(iss, feventName, '-');
+			std::getline(iss, fuserID, '\n');
+			tmp = getEvent(feventName);
+			if (tmp.data.location == filter.location)
+				events.push_back(tmp);
+		}
+	}
+	else if (filter.futureEvents)
+	{
+		while (std::getline(userEventFile, fline))
+		{
+			std::stringstream iss(fline);
+			std::getline(iss, feventName, '-');
+			std::getline(iss, fuserID, '\n');
+			tmp = getEvent(feventName);
+			if (tmp.data.startYear>currentDate.tm_year+1900 || 
+				tmp.data.startYear==currentDate.tm_year+1900 && tmp.data.startMonth>currentDate.tm_mon+1 ||
+				tmp.data.startYear == currentDate.tm_year + 1900 && tmp.data.startMonth == currentDate.tm_mon + 1 && tmp.data.startDay>currentDate.tm_mday)
+				events.push_back(tmp);
+		}
+	}
+	else if (filter.pastEvents)
+	{
+		while (std::getline(userEventFile, fline))
+		{
+			std::stringstream iss(fline);
+			std::getline(iss, feventName, '-');
+			std::getline(iss, fuserID, '\n');
+			tmp = getEvent(feventName);
+			if (tmp.data.startYear < currentDate.tm_year + 1900 ||
+				tmp.data.startYear == currentDate.tm_year + 1900 && tmp.data.startMonth < currentDate.tm_mon + 1 ||
+				tmp.data.startYear == currentDate.tm_year + 1900 && tmp.data.startMonth == currentDate.tm_mon + 1 && tmp.data.startDay < currentDate.tm_mday)
+				events.push_back(tmp);
+		}
+	}
+	userEventFile.close();
+	return events;
 }

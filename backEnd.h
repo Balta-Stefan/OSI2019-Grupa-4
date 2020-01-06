@@ -43,10 +43,11 @@ struct eventList
 	std::vector<std::string>specialRequirements; //posebni zahtjevi dogadjaja 
 };
 
-struct eventFilter
-{	//koristi se za filtriranje dogadjaja 
-	unsigned short startHour, startMinute, endHour, endMinute, startMonth, startDay, startYear, endMonth, endDay, endYear; //informacije o pocetku i zavrsetu dogadjaja 
-	std::string location; //mjesto odrzavanja dogadjaj 
+
+struct eventsFilter
+{
+	bool todayEvents, futureEvents, pastEvents;
+	std::string location;
 	std::string category;
 };
 
@@ -86,13 +87,13 @@ struct quiz4Players getQuestions4Player();
 int checkPlayersAnswers(struct quiz &playerQandA);
 std::string removeComment(std::string commentID, std::string eventName);
 struct event getEvent(std::string eventName);
-std::vector<eventList> getEvents(struct eventFilter &filter);
 std::string addEvent(struct newEvent &event2Add, std::string sessionID);
 char genRandomChar();
 std::string genRandomString(std::string&);
 bool checkSessionID(std::string&);
 std::string logOut(std::string sessionID);
 bool checkCommentID(std::string&, std::string&);
+std::vector<event> getFilteredEvents(struct eventsFilter &);
 
 
 
