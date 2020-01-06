@@ -48,7 +48,7 @@ bool checkUserID(std::string& userID)
 std::string registerUser(std::string username, std::string password)
 {
 	std::ifstream usersFileInput("korisnici.txt");
-	std::string fline, fuserID, fusername, fpassword, fnumber, userID;
+	std::string fline, fuserID, fusername, fpassword, fnumber,userID;
 	if (usersFileInput.is_open() == false)
 		return "Greska,zahtjev nije moguce ispuniti.";
 	while (std::getline(usersFileInput, fline))
@@ -62,8 +62,20 @@ std::string registerUser(std::string username, std::string password)
 			return "Korisnik sa unesenim korisnickim imenom vec postoji.";
 	}
 	usersFileInput.close();
+	std::ifstream adminsFile("admini.txt");
+	while (std::getline(adminsFile, fline))
+	{
+		std::stringstream iss2(fline);
+		std::getline(iss2, fuserID, '-');
+		std::getline(iss2, fusername, '-');
+		std::getline(iss2, fpassword, '\n');
+		if (fusername == username)
+			return "Korisnik sa unesenim korisnickim imenom vec postoji.";
+	}
+	adminsFile.close();
 	do
 	{
+		userID = "";
 		genRandomString(userID);
 	} while (!checkUserID(userID));
 	std::fstream usersFileOutput("korisnici.txt", std::ios::app);
