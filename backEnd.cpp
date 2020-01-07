@@ -32,12 +32,21 @@ bool isAdmin(std::string sessionID)
 	return false;
 }
 
-std::string login(std::string username, std::string password)
-{
+loginConfirmation login(std::string username, std::string password)
+{	
+	loginConfirmation tempConfirmation;
+	tempConfirmation.sessionID = "";
+	tempConfirmation.message = "";
+	tempConfirmation.userRank = 0;
+	
 	std::string fuserID, fusername, fpassword, fnumber, fline;
 	std::ifstream users("korisnici.txt");
 	if (users.is_open() == false)
-		return fileOpeningError;
+	{	
+		tempConfirmation.message = fileOpeningError;
+		return tempConfirmation;
+	}
+		
 	while (std::getline(users, fline))
 	{
 		std::stringstream iss(fline);
@@ -49,7 +58,11 @@ std::string login(std::string username, std::string password)
 		if (fusername == username && fpassword == password)
 		{
 			if (fnum == 1)
-				return userBanned;
+			{
+				tempConfirmation.message = userBanned;
+				return tempConfirmation;
+			}
+				
 			std::string sessionID;
 			do
 			{
@@ -62,14 +75,20 @@ std::string login(std::string username, std::string password)
 			newSession.userName = fusername;
 			newSession.userRank = fnum;
 			sessions.push_back(newSession);
-			return successfulLogin;
+			tempConfirmation.sessionID = sessionID;
+			tempConfirmation.message = successfulLogin;
+			return tempConfirmation;
 		}
 
 	}
 	users.close();
 	std::ifstream admins("admini.txt");
 	if (admins.is_open() == false)
-		return fileOpeningError;
+	{
+		tempConfirmation.message = fileOpeningError;
+		return tempConfirmation;
+	}
+		
 	while (std::getline(admins, fline))
 	{
 		std::stringstream iss(fline);
@@ -90,11 +109,17 @@ std::string login(std::string username, std::string password)
 			newSession.userName = fusername;
 			newSession.userRank = 1;
 			sessions.push_back(newSession);
-			return successfulLogin;
+			
+			tempConfirmation.userRank = 1;
+			tempConfirmation.sessionID = sessionID;
+			tempConfirmation.message = successfulLogin;
+			return tempConfirmation;
+			
 		}
 	}
 	admins.close();
-	return unsuccessfulLogin;
+	tempConfirmation.message = unsuccessfulLogin;
+	return tempConfirmation;
 }
 
 std::string eventComment(std::string comment, std::string eventName, std::string sessionID)

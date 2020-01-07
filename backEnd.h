@@ -11,10 +11,19 @@
 
 //global variable: vector<struct session> sessions
 
+struct loginConfirmation
+{
+	std::string sessionID, message;
+	int userRank;
+};
+
+
 struct loginInfo
 {
 	std::string username, password;
 };
+
+
 
 struct session
 {
@@ -75,7 +84,7 @@ struct newEvent
 
 session* authenticate(std::string sessionID);
 bool isAdmin(std::string sessionID);
-std::string login(std::string username, std::string password);
+loginConfirmation login(std::string username, std::string password);
 std::string eventComment(std::string comment, std::string eventName, std::string sessionID);
 std::string banUser(std::string userName);
 struct quiz getQuizInfo();
