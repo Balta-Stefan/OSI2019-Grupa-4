@@ -11,7 +11,7 @@ int stringLength = sizeof(alphanum) - 1;
 std::vector<struct session> sessions;
 std::string fileOpeningError = "Greska,zahtjev nije moguce ispuniti.",
 successfulLogin = "Uspjesno prijavljivanje.", unsuccessfulLogin = "Neuspjesno prijavljivanje.", userBanned="Ovaj nalog je banovan.",
-successfulBan = "Korisnik uspjesno banovan.", unsuccessfulBan = "Korisnik sa takvim imenom ne postoji.",
+successfulBan = "Korisnik uspjesno banovan.", unsuccessfulBan = "Korisnik sa takvim imenom ne postoji.", alreadyBanned = "Korisnik je vec banovan.",
 commentAdded = "Komentar uspjesno dodan.",
 unsuccessfulComment = "Neuspjesno brisanje komentara.", successfulComment="Komentar uspjesno obrisan.",successfulLogOut="Uspjesno odjavljivanje.",
 unsuccessfulLogOut="Neuspjesno odjavljivanje.",
@@ -158,6 +158,8 @@ std::string banUser(std::string userName)
 		int fnum = std::stoi(fnumber);
 		if (fusername == userName)
 		{
+			if (fnum == 1)
+				return alreadyBanned;
 			if (fnum == 0)
 			{
 				fnumber = "1";
