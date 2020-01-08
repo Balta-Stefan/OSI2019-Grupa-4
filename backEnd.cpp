@@ -371,7 +371,7 @@ std::string removeComment(std::string commentID, std::string eventName)
 }
 
 struct event getEvent(std::string eventName)
-{
+{	
 	std::ifstream userEvent("korisnikDogadjaj.txt");
 	std::string fline, fuserID, fevent;
 	int flag = 0;
@@ -391,6 +391,7 @@ struct event getEvent(std::string eventName)
 	}
 	userEvent.close();
 	std::ifstream longDescriptionFile(eventName + "\\opis.txt");//mozda bi trebalo provjeriti da li su svi fajlovi pravilno otvoreni
+
 	event requestedEvent;
 	std::string longDescription = "", shortDescription = "", fcommentID, fuserName, fcomment;//ali kako signalizirati ako nisu dobro otvoreni, jer ne vraca funkcija poruku
 	while (std::getline(longDescriptionFile, fline, '\n'))
@@ -398,11 +399,13 @@ struct event getEvent(std::string eventName)
 	requestedEvent.description = longDescription;
 	longDescriptionFile.close();
 	std::ifstream shortDescriptionFile(eventName + "\\kratakOpis.txt");
+
 	while (std::getline(shortDescriptionFile, fline))
 		shortDescription += fline + '\n';
 	requestedEvent.data.shortDescription = shortDescription;
 	shortDescriptionFile.close();
 	std::ifstream dateAndLocationFile(eventName + "\\datumiMjesto.txt");
+
 	std::getline(dateAndLocationFile, fline, '-');
 	requestedEvent.data.startHour = stoi(fline);
 	std::getline(dateAndLocationFile, fline, '-');
@@ -500,7 +503,7 @@ std::string addEvent(struct newEvent& event2Add, std::string sessionID)
 	for (auto& i : event2Add.eventData.specialRequirements)
 		specialRequests << i << "-";
 	return successfulEvent;
-
+	std::ofstream comments(event2Add.eventData.eventName + "\\komentari.txt");
 
 }
 
@@ -859,23 +862,24 @@ void send()
 			answer << correct;
 			answer.close();
 		}
-		/*else if (ownEvents.is_open())
+		else if (ownEvents.is_open())
 		{
 			std::string userSessionID;
 			ownEvents >> userSessionID;
 			ownEvents.close();
 			std::this_thread::sleep_for(std::chrono::milliseconds(100));
-			remove("ownEvents.txt");
+			remove("ownEventsRequest.txt");
 
 			std::vector<std::string> usersEventsList;
-			std::ofstream response("ownEventsAnswer.bin", std::ios::binary);
+			std::ofstream response("ownEventsAnswer2.bin", std::ios::binary);
 
 			usersEventsList = getOwnEvents(userSessionID);
 			cereal::BinaryOutputArchive oarchive(response);
 			oarchive(usersEventsList);
 
 			response.close();
-		}*/
+			rename("ownEventsAnswer2.bin", "ownEventsAnswer.bin");
+		}
 		else if (logOutRequest.is_open())
 		{
 			std::string userSessionID;
@@ -957,12 +961,13 @@ void send()
 		else if (checkEvent.is_open())
 		{
 			std::string eventName;
-			checkEvent >> eventName;
+			std::getline(checkEvent, eventName);
+			//checkEvent >> eventName;
 			checkEvent.close();
 			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			remove("getEvent.txt");
 
-			std::ofstream giveEvent("getEventResponse.bin", std::ios::binary);
+			std::ofstream giveEvent("getEventResponse2.bin", std::ios::binary);
 			//struct event getEvent(std::string eventName);
 			event TempEvent = getEvent(eventName);
 
@@ -971,6 +976,7 @@ void send()
 
 
 			giveEvent.close();
+			rename("getEventResponse2.bin", "getEventResponse.bin");
 		}
 		else if (addCommentRequest.is_open())
 		{	
@@ -983,9 +989,10 @@ void send()
 			
 
 			std::string  response = eventComment(tempStruct.comment, tempStruct.eventName, tempStruct.sessionID);
-			std::ofstream giveResponse("addCommentResponse.txt");
+			std::ofstream giveResponse("addCommentResponse2.txt");
 			giveResponse << response;
 			giveResponse.close();
+			rename("addCommentResponse2.txt", "addCommentResponse.txt");
 		}
 
 		

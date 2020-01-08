@@ -154,13 +154,15 @@ void dodavanjeDogadjaja()
 	tempEvent.sessionID = sessionID;
 	tempEvent.notDuplicate = false;
 
-	std::cout << "ime dogadjaja: ";
+	std::cout << "ime dogadjaja: " << std::endl;
 	std::cin.ignore();
 	std::getline(std::cin, tempEvent.eventData.eventName);
+	std::cout << "ime je: " << tempEvent.eventData.eventName << std::endl;
 	//std::cin >> tempEvent.eventData.eventName;
 	std::cout << "kratak opis:" << std::endl;
-	std::cin.ignore();
+	//std::cin.ignore();
 	std::getline(std::cin, tempEvent.eventData.shortDescription);
+	std::cout << "kratki opis je: " << tempEvent.eventData.shortDescription << std::endl;
 
 	std::cout << "pocetak (sat)" << " ";
 	std::cin >> tempEvent.eventData.startHour;
@@ -216,7 +218,8 @@ void dodavanjeDogadjaja()
 	std::cout << std::endl;
 
 	for (int i = 0; i < brojZahtjeva; i++)
-	{
+	{	
+		std::cout << "unesite poseban zahtjev: " << std::endl;
 		std::string temp;
 		std::cin >> temp;
 		tempEvent.eventData.specialRequirements.push_back(temp);
@@ -230,7 +233,7 @@ void dodavanjeDogadjaja()
 
 	
 	std::cout << "unesite opis dogadjaja: " << std::endl;
-	std::cin.ignore();
+	//std::cin.ignore();
 	std::getline(std::cin, tempEvent.description);
 
 
@@ -479,13 +482,15 @@ void getEvent(std::string eventName)
 		std::cout << tempEvent.comments[i] << std::endl;
 	}
 
-	std::cout << "1)izlaz" << std::endl;
-	std::cout << "2)dodaj komentar" << std::endl;
+	
 
 	while (true)
 	{
+		std::cout << "1)izlaz" << std::endl;
+		std::cout << "2)dodaj komentar" << std::endl;
 		int answer;
 		std::cin >> answer;
+		std::cout << std::endl;
 
 		if (answer == 1)
 		{
@@ -505,10 +510,11 @@ void getEvent(std::string eventName)
 				komentar.eventName = eventName;
 				komentar.sessionID = sessionID;
 
-				std::ofstream file("addCommentRequest.bin", std::ios::binary);
+				std::ofstream file("addCommentRequest2.bin", std::ios::binary);
 				cereal::BinaryOutputArchive oarchive(file);
 				oarchive(komentar);
 				file.close();
+				rename("addCommentRequest2.bin", "addCommentRequest.bin");
 
 				while (true)
 				{
@@ -517,9 +523,9 @@ void getEvent(std::string eventName)
 					if (response.is_open())
 					{
 						std::string answer;
-						std::cin.ignore();
+						//std::cin.ignore();
 						std::getline(response, answer);
-						std::cout << "answer" << std::endl;
+						std::cout << answer << std::endl;
 						response.close();
 						std::this_thread::sleep_for(std::chrono::milliseconds(100));
 						remove("addCommentResponse.txt");
@@ -548,7 +554,8 @@ void logOut()
 }
 
 void pregledVlastitihDogadaja()
-{
+{	
+	system("cls");
 	std::ofstream file("ownEventsRequest.txt");
 	file << sessionID;
 	file.close();
@@ -571,7 +578,11 @@ void pregledVlastitihDogadaja()
 	}
 
 	while (true)
-	{
+	{	
+		for (unsigned int i = 0; i < ownEvents.size(); i++)
+			std::cout << i+1 << ")" << ownEvents[i] << std::endl;
+
+		std::cout << std::endl;
 		int response;
 		std::cout << "1)pregledaj dogadjaj" << std::endl;
 		std::cout << "2)izlaz" << std::endl;
@@ -582,9 +593,9 @@ void pregledVlastitihDogadaja()
 			unsigned int event;
 			std::cout << "unesite redni broj dogadjaja" << std::endl;
 			std::cin >> event;
-			if ((event >= 0) && (event < ownEvents.size()))
+			if ((event > 0) && (event <= ownEvents.size()))
 			{
-				getEvent(ownEvents[event]);
+				getEvent(ownEvents[event - 1]);
 				system("cls");
 			}
 			else
