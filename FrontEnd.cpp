@@ -611,11 +611,11 @@ void banovanjeKorisnika()
 void izmjenaKategorija()
 {
 	std::ofstream file("changeCategoriesRequest.txt");
-	file << sessionID;
 	file.close();
 
 
 	std::vector<std::string> categories;
+	categories.push_back(sessionID);
 	while (true)
 	{
 		std::this_thread::sleep_for(std::chrono::milliseconds(200));
