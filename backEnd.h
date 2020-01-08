@@ -71,6 +71,7 @@ struct event
 	std::vector<std::string>userNames; //korisnicka imena 
 	std::vector<std::string>comments; //sadrzi komentare od korisnika iz vektora userNames
 	std::vector<std::string>commentIDs; //sadrzi identifikatore komentara
+	std::string sessionID;
 };
 
 struct newEvent

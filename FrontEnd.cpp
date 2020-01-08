@@ -149,6 +149,7 @@ void dodavanjeDogadjaja()
 	//backend gives answer via a text file called addEventAnswer.txt
 
 	newEvent tempEvent;
+	tempEvent.sessionID = sessionID;
 	tempEvent.notDuplicate = false;
 
 	std::cout << "ime dogadjaja: ";
