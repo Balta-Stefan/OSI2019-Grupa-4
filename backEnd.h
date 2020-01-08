@@ -11,17 +11,6 @@
 
 //global variable: vector<struct session> sessions
 
-struct loginConfirmation
-{
-	std::string sessionID, message;
-	int userRank;
-};
-
-
-struct loginInfo
-{
-	std::string username, password;
-};
 
 
 
@@ -29,28 +18,17 @@ struct session
 {
 	std::string sessionID, userName, userID;
 	int userRank; //0 za obicne korisnike, 1 za administratore
+	
 };
 
-struct quiz
-{
-	std::vector<std::string> questions, answers;
-	std::vector<int> rightAnswers;
-};
+
 
 struct quiz4Players
 {
 	std::vector<std::string> questions, answers;
 };
 
-struct eventList
-{	//sadrzi osnovne informacije za pregled dogadjaja na glavnoj stranici
-	//slika, ostaviti za kasnije
-	std::string eventName;
-	std::string shortDescription;
-	unsigned short startHour, startMinute, endHour, endMinute, startMonth, startDay, startYear, endMonth, endDay, endYear; //informacije o pocetku i zavrsetu dogadjaja 
-	std::string location; //mjesto odrzavanja dogadjaja 
-	std::vector<std::string>specialRequirements; //posebni zahtjevi dogadjaja 
-};
+
 
 
 struct eventsFilter
@@ -59,28 +37,9 @@ struct eventsFilter
 	std::string category;
 };
 
-struct event
-{	//daje informacije o konkretnom dogadjaju
 
-	//dodati sliku kasnije
-	struct eventList data; //sadrzi i samu strukturu eventList
-	std::string description; //tekst koji opisuje dogadjaj
-	std::string category;
 
-	//i-ti indeksi vektora ispod su u vezi
-	std::vector<std::string>userNames; //korisnicka imena 
-	std::vector<std::string>comments; //sadrzi komentare od korisnika iz vektora userNames
-	std::vector<std::string>commentIDs; //sadrzi identifikatore komentara
-	std::string sessionID;
-};
 
-struct newEvent
-{	//za dodavanje novog dogadjaja 
-	struct eventList eventList;
-	std::string category;
-	std::string description; //opis dogadjaja 
-	bool notDuplicate; //omogucava korisniku da doda dogadjaj ako se posumnja da je dogadjaj mozda vec dodan
-};
 
 
 session* authenticate(std::string sessionID);
@@ -103,7 +62,7 @@ bool checkSessionID(std::string&);
 std::string logOut(std::string sessionID);
 bool checkCommentID(std::string&, std::string&);
 std::vector<event> getFilteredEvents(struct eventsFilter &);
-std::vector<std::string> getOwnEvents(std::string& sessionID);
+//std::vector<std::string> getOwnEvents(std::string& sessionID);
 
 
 

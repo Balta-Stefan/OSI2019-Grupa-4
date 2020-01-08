@@ -1,3 +1,15 @@
+
+
+#include <iostream>
+#include <vector>
+#include <string>
+#include <thread>
+#include <chrono>
+#include <cereal/types/vector.hpp>
+#include <cereal/types/string.hpp>
+#include <cereal/archives/binary.hpp>
+#include <fstream>
+#include "commonStructures.h"
 #include "backEnd.h"
 
 static const char alphanum[] =
@@ -10,12 +22,12 @@ int stringLength = sizeof(alphanum) - 1;
 
 std::vector<struct session> sessions;
 std::string fileOpeningError = "Greska,zahtjev nije moguce ispuniti.",
-successfulLogin = "Uspjesno prijavljivanje.", unsuccessfulLogin = "Neuspjesno prijavljivanje.", userBanned="Ovaj nalog je banovan.",
+successfulLogin = "Uspjesno prijavljivanje.", unsuccessfulLogin = "Neuspjesno prijavljivanje.", userBanned = "Ovaj nalog je banovan.",
 successfulBan = "Korisnik uspjesno banovan.", unsuccessfulBan = "Korisnik sa takvim imenom ne postoji.", alreadyBanned = "Korisnik je vec banovan.",
 commentAdded = "Komentar uspjesno dodan.",
-unsuccessfulComment = "Neuspjesno brisanje komentara.", successfulComment="Komentar uspjesno obrisan.",successfulLogOut="Uspjesno odjavljivanje.",
-unsuccessfulLogOut="Neuspjesno odjavljivanje.",
-successfulEvent="Dogadjaj uspjesno dodan.",alreadyExistingEvent="Dogadjaj sa ovim imenom vec postoji.";
+unsuccessfulComment = "Neuspjesno brisanje komentara.", successfulComment = "Komentar uspjesno obrisan.", successfulLogOut = "Uspjesno odjavljivanje.",
+unsuccessfulLogOut = "Neuspjesno odjavljivanje.",
+successfulEvent = "Dogadjaj uspjesno dodan.", alreadyExistingEvent = "Dogadjaj sa ovim imenom vec postoji.";
 
 session* authenticate(std::string sessionID)
 {
@@ -27,31 +39,31 @@ session* authenticate(std::string sessionID)
 bool isAdmin(std::string sessionID)
 {
 	for (auto& i : sessions)
-		if (i.sessionID == sessionID&&i.userRank==1)
+		if (i.sessionID == sessionID && i.userRank == 1)
 			return true;
 	return false;
 }
 
-std::vector<std::string> getOwnEvents(std::string& sessionID)
+/*std::vector<std::string> getOwnEvents(std::string& sessionID)
 {
-	
-}
+
+}*/
 
 loginConfirmation login(std::string username, std::string password)
-{	
+{
 	loginConfirmation tempConfirmation;
 	tempConfirmation.sessionID = "";
 	tempConfirmation.message = "";
 	tempConfirmation.userRank = 0;
-	
+
 	std::string fuserID, fusername, fpassword, fnumber, fline;
 	std::ifstream users("korisnici.txt");
 	if (users.is_open() == false)
-	{	
+	{
 		tempConfirmation.message = fileOpeningError;
 		return tempConfirmation;
 	}
-		
+
 	while (std::getline(users, fline))
 	{
 		std::stringstream iss(fline);
@@ -67,11 +79,11 @@ loginConfirmation login(std::string username, std::string password)
 				tempConfirmation.message = userBanned;
 				return tempConfirmation;
 			}
-				
+
 			std::string sessionID;
 			do
 			{
-				sessionID="";
+				sessionID = "";
 				genRandomString(sessionID);
 			} while (checkSessionID(sessionID));
 			struct session newSession;
@@ -93,7 +105,7 @@ loginConfirmation login(std::string username, std::string password)
 		tempConfirmation.message = fileOpeningError;
 		return tempConfirmation;
 	}
-		
+
 	while (std::getline(admins, fline))
 	{
 		std::stringstream iss(fline);
@@ -102,10 +114,10 @@ loginConfirmation login(std::string username, std::string password)
 		std::getline(iss, fpassword, '\n');
 		if (fusername == username && fpassword == password)
 		{
-			std::string sessionID ;
+			std::string sessionID;
 			do
 			{
-				sessionID="";
+				sessionID = "";
 				genRandomString(sessionID);
 			} while (checkSessionID(sessionID));
 			struct session newSession;
@@ -114,12 +126,12 @@ loginConfirmation login(std::string username, std::string password)
 			newSession.userName = fusername;
 			newSession.userRank = 1;
 			sessions.push_back(newSession);
-			
+
 			tempConfirmation.userRank = 1;
 			tempConfirmation.sessionID = sessionID;
 			tempConfirmation.message = successfulLogin;
 			return tempConfirmation;
-			
+
 		}
 	}
 	admins.close();
@@ -129,15 +141,15 @@ loginConfirmation login(std::string username, std::string password)
 
 std::string eventComment(std::string comment, std::string eventName, std::string sessionID)
 {
-	std::string fileName = eventName + "\\komentari.txt", commentID="";
-	std::fstream comments(fileName,std::ios::app);
+	std::string fileName = eventName + "\\komentari.txt", commentID = "";
+	std::fstream comments(fileName, std::ios::app);
 	if (!comments)
 		return fileOpeningError;
 	do
 	{
 		commentID = "";
 		genRandomString(commentID);
-	} while (!checkCommentID(commentID,eventName));
+	} while (!checkCommentID(commentID, eventName));
 	comments << commentID << "-";
 	for (auto& i : sessions)
 		if (i.sessionID == sessionID)
@@ -149,7 +161,7 @@ std::string eventComment(std::string comment, std::string eventName, std::string
 std::string banUser(std::string userName)
 {
 	std::string fuserID, fusername, fpassword, fnumber, fline, fileText = "";
-	int flag=0;
+	int flag = 0;
 	std::ifstream users("korisnici.txt");
 	if (users.is_open() == false)
 		return fileOpeningError;
@@ -170,7 +182,7 @@ std::string banUser(std::string userName)
 				fnumber = "1";
 				flag = 1;
 			}
-				
+
 		}
 		fileText += fuserID + '-' + fusername + '-' + fpassword + '-' + fnumber + '\n';
 	}
@@ -222,7 +234,7 @@ struct quiz getQuizInfo()
 	return quizinfo;
 }
 
-void editQuiz(struct quiz &newQuiz)
+void editQuiz(struct quiz& newQuiz)
 {
 	int i;
 	std::ofstream quizQuestions("kvizPitanja.txt");
@@ -241,7 +253,7 @@ void editQuiz(struct quiz &newQuiz)
 		else
 			quizAnswers << newQuiz.answers[newQuiz.rightAnswers[i]] << "-";
 	quizAnswers.close();
-	
+
 }
 
 std::vector<std::string> getCategories()
@@ -265,7 +277,7 @@ std::vector<std::string> getCategories()
 
 void changeCategories(std::vector<std::string> newCategories)
 {
-	unsigned int i,j,flag=0;
+	unsigned int i, j, flag = 0;
 	for (i = 0; i < newCategories.size(); i++)
 	{
 		for (j = 0; j < newCategories.size(); j++)
@@ -273,13 +285,13 @@ void changeCategories(std::vector<std::string> newCategories)
 			{
 				flag++;
 				if (flag != 1)
-					newCategories.erase(newCategories.begin()+j);
+					newCategories.erase(newCategories.begin() + j);
 			}
 		flag = 0;
 
 	}
 	std::ofstream categories("kategorije.txt");
-	for (i = 0; i < newCategories.size()-1; i++)
+	for (i = 0; i < newCategories.size() - 1; i++)
 		categories << newCategories[i] << "-";
 	categories << newCategories[i];
 }
@@ -297,7 +309,7 @@ struct quiz4Players getQuestions4Player()
 	return quizForPlayers;
 }
 
-int checkPlayersAnswers(struct quiz &playerQandA)
+int checkPlayersAnswers(struct quiz& playerQandA)
 {
 	int k = 0, numOfCorrectAnswers = 0;
 	struct quiz quizInfo = getQuizInfo();
@@ -310,13 +322,13 @@ int checkPlayersAnswers(struct quiz &playerQandA)
 
 	}
 	return numOfCorrectAnswers;
-	
+
 	//STRUKTURA playerQandA sadrzi samo pitanja i odgovore KORISNIKA,dok vektor rightAnswers ostaje prazan i zanemaruje se
 }
 
 std::string removeComment(std::string commentID, std::string eventName)
 {
-	std::string fileName = eventName + "\\komentari.txt",fline,fcommentID,fuserName,fcomment,fileText="";
+	std::string fileName = eventName + "\\komentari.txt", fline, fcommentID, fuserName, fcomment, fileText = "";
 	int flag = 0;
 	std::ifstream comments(fileName);
 	if (comments.is_open() == false)
@@ -340,7 +352,7 @@ std::string removeComment(std::string commentID, std::string eventName)
 	std::ofstream commentsInput(fileName);
 	if (commentsInput.is_open() == false)
 		return fileOpeningError;
-	commentsInput<< fileText;
+	commentsInput << fileText;
 	commentsInput.close();
 	return successfulComment;
 }
@@ -348,8 +360,8 @@ std::string removeComment(std::string commentID, std::string eventName)
 struct event getEvent(std::string eventName)
 {
 	std::ifstream userEvent("korisnikDogadjaj.txt");
-	std::string fline,fuserID,fevent;
-	int flag=0;
+	std::string fline, fuserID, fevent;
+	int flag = 0;
 	while (std::getline(userEvent, fline))
 	{
 		std::stringstream iss(fline);
@@ -367,9 +379,9 @@ struct event getEvent(std::string eventName)
 	userEvent.close();
 	std::ifstream longDescriptionFile(eventName + "\\opis.txt");//mozda bi trebalo provjeriti da li su svi fajlovi pravilno otvoreni
 	event requestedEvent;
-	std::string longDescription = "", shortDescription = "",fcommentID,fuserName,fcomment;//ali kako signalizirati ako nisu dobro otvoreni, jer ne vraca funkcija poruku
-	while (std::getline(longDescriptionFile, fline,'\n'))
-		longDescription += fline+'\n';
+	std::string longDescription = "", shortDescription = "", fcommentID, fuserName, fcomment;//ali kako signalizirati ako nisu dobro otvoreni, jer ne vraca funkcija poruku
+	while (std::getline(longDescriptionFile, fline, '\n'))
+		longDescription += fline + '\n';
 	requestedEvent.description = longDescription;
 	longDescriptionFile.close();
 	std::ifstream shortDescriptionFile(eventName + "\\kratakOpis.txt");
@@ -399,7 +411,7 @@ struct event getEvent(std::string eventName)
 	std::getline(dateAndLocationFile, fline, '-');
 	requestedEvent.data.endYear = stoi(fline);
 	std::getline(dateAndLocationFile, fline, '-');
-	requestedEvent.data.location= fline;
+	requestedEvent.data.location = fline;
 	std::getline(dateAndLocationFile, fline, '\n');
 	requestedEvent.category = fline;
 	requestedEvent.data.eventName = eventName;
@@ -421,12 +433,12 @@ struct event getEvent(std::string eventName)
 	}
 	commentsFile.close();
 	return requestedEvent;
-	
+
 
 }
 
 
-std::string addEvent(struct newEvent &event2Add, std::string sessionID)
+std::string addEvent(struct newEvent& event2Add, std::string sessionID)
 {
 	std::ifstream userEvent("korisnikDogadjaj.txt");
 	if (userEvent.is_open() == false)
@@ -438,44 +450,44 @@ std::string addEvent(struct newEvent &event2Add, std::string sessionID)
 		std::stringstream iss(fline);
 		std::getline(iss, fevent, '-');
 		std::getline(iss, fuserID, '\n');
-		if(fevent==event2Add.eventList.eventName)
+		if (fevent == event2Add.eventData.eventName)
 			flag++;
 	}
 	if (flag != 0)
 		return alreadyExistingEvent;
 	userEvent.close();
-	CreateDirectoryA((LPCSTR)event2Add.eventList.eventName.c_str(), NULL);
-	std::ofstream dateAndLocation(event2Add.eventList.eventName+"\\datumiMjesto.txt");
+	CreateDirectoryA((LPCSTR)event2Add.eventData.eventName.c_str(), NULL);
+	std::ofstream dateAndLocation(event2Add.eventData.eventName + "\\datumiMjesto.txt");
 	if (dateAndLocation.is_open() == false)
 		return fileOpeningError;
-	dateAndLocation << event2Add.eventList.startHour << "-" << event2Add.eventList.startMinute << "-" << event2Add.eventList.endHour << "-" << event2Add.eventList.endMinute << "-"
-	<< event2Add.eventList.startDay << "-" << event2Add.eventList.startMonth << "-" << event2Add.eventList.startYear << "-"
-	<< event2Add.eventList.endDay << "-" << event2Add.eventList.endMonth << "-" << event2Add.eventList.endYear << "-"
-	<< event2Add.eventList.location << "-" << event2Add.category << "\n";
+	dateAndLocation << event2Add.eventData.startHour << "-" << event2Add.eventData.startMinute << "-" << event2Add.eventData.endHour << "-" << event2Add.eventData.endMinute << "-"
+		<< event2Add.eventData.startDay << "-" << event2Add.eventData.startMonth << "-" << event2Add.eventData.startYear << "-"
+		<< event2Add.eventData.endDay << "-" << event2Add.eventData.endMonth << "-" << event2Add.eventData.endYear << "-"
+		<< event2Add.eventData.location << "-" << event2Add.category << "\n";
 	dateAndLocation.close();
-	std::fstream userEvent2("korisnikDogadjaj.txt",std::ios::app);
+	std::fstream userEvent2("korisnikDogadjaj.txt", std::ios::app);
 	if (userEvent2.is_open() == false)
 		return fileOpeningError;
 	session* session = authenticate(sessionID);
-	userEvent2 << event2Add.eventList.eventName << "-" << (*session).userID << '\n';
+	userEvent2 << event2Add.eventData.eventName << "-" << (*session).userID << '\n';
 	userEvent2.close();
-	std::ofstream shortDescription(event2Add.eventList.eventName + "\\kratakOpis.txt");
+	std::ofstream shortDescription(event2Add.eventData.eventName + "\\kratakOpis.txt");
 	if (shortDescription.is_open() == false)
 		return fileOpeningError;
-	shortDescription << event2Add.eventList.shortDescription;
+	shortDescription << event2Add.eventData.shortDescription;
 	shortDescription.close();
-	std::ofstream longDescription(event2Add.eventList.eventName + "\\opis.txt");
+	std::ofstream longDescription(event2Add.eventData.eventName + "\\opis.txt");
 	if (longDescription.is_open() == false)
 		return fileOpeningError;
 	longDescription << event2Add.description;
 	longDescription.close();
-	std::ofstream specialRequests(event2Add.eventList.eventName+"\\posebniZahtjevi.txt");
+	std::ofstream specialRequests(event2Add.eventData.eventName + "\\posebniZahtjevi.txt");
 	if (specialRequests.is_open() == false)
 		return fileOpeningError;
-	for (auto& i : event2Add.eventList.specialRequirements)
+	for (auto& i : event2Add.eventData.specialRequirements)
 		specialRequests << i << "-";
 	return successfulEvent;
-	
+
 
 }
 
@@ -497,7 +509,7 @@ std::string genRandomString(std::string& sessionID)
 
 bool checkSessionID(std::string& sessionID)
 {
-	for (unsigned int i=0; i<sessions.size(); ++i)
+	for (unsigned int i = 0; i < sessions.size(); ++i)
 		if (sessionID == sessions[i].sessionID)
 			return true;
 	return false;
@@ -519,7 +531,7 @@ std::string logOut(std::string sessionID)
 bool checkCommentID(std::string& commentID, std::string& eventName)
 {
 	std::ifstream commentsFile(eventName + "\\komentari.txt");
-	std:: string fline, fcommentID, fuserName, fcomment;
+	std::string fline, fcommentID, fuserName, fcomment;
 	while (std::getline(commentsFile, fline))
 	{
 		std::stringstream iss(fline);
@@ -532,7 +544,7 @@ bool checkCommentID(std::string& commentID, std::string& eventName)
 	commentsFile.close();
 	return true;
 }
-std::vector<event> getFilteredEvents(struct eventsFilter &filter)
+std::vector<event> getFilteredEvents(struct eventsFilter& filter)
 {
 
 	//prihvaca strukturu eventFilter koja daje informacije o tome sta korisnik zeli da trazi, vraca se vektor sa strukturama od kojih svaka daje informacije o nekom dogadjaju
@@ -545,7 +557,7 @@ std::vector<event> getFilteredEvents(struct eventsFilter &filter)
 	localtime_s(&currentDate, &now);
 	if (!filter.pastEvents && !filter.futureEvents && filter.category == "" && !filter.todayEvents)
 		return events;
-	else if (!filter.pastEvents && !filter.futureEvents && filter.category=="")
+	else if (!filter.pastEvents && !filter.futureEvents && filter.category == "")
 	{
 		while (std::getline(userEventFile, fline))
 		{
@@ -553,7 +565,7 @@ std::vector<event> getFilteredEvents(struct eventsFilter &filter)
 			std::getline(iss, feventName, '-');
 			std::getline(iss, fuserID, '\n');
 			tmp = getEvent(feventName);
-			if (tmp.data.startDay==currentDate.tm_mday && tmp.data.startMonth==currentDate.tm_mon+1 && tmp.data.startYear==currentDate.tm_year+1900)
+			if (tmp.data.startDay == currentDate.tm_mday && tmp.data.startMonth == currentDate.tm_mon + 1 && tmp.data.startYear == currentDate.tm_year + 1900)
 				events.push_back(tmp);
 		}
 	}
@@ -569,7 +581,7 @@ std::vector<event> getFilteredEvents(struct eventsFilter &filter)
 				events.push_back(tmp);
 		}
 	}
-	else if (!filter.pastEvents && !filter.todayEvents && filter.category=="")
+	else if (!filter.pastEvents && !filter.todayEvents && filter.category == "")
 	{
 		while (std::getline(userEventFile, fline))
 		{
@@ -577,13 +589,13 @@ std::vector<event> getFilteredEvents(struct eventsFilter &filter)
 			std::getline(iss, feventName, '-');
 			std::getline(iss, fuserID, '\n');
 			tmp = getEvent(feventName);
-			if (tmp.data.startYear>currentDate.tm_year+1900 || 
-				tmp.data.startYear==currentDate.tm_year+1900 && tmp.data.startMonth>currentDate.tm_mon+1 ||
-				tmp.data.startYear == currentDate.tm_year + 1900 && tmp.data.startMonth == currentDate.tm_mon + 1 && tmp.data.startDay>currentDate.tm_mday)
+			if (tmp.data.startYear > currentDate.tm_year + 1900 ||
+				tmp.data.startYear == currentDate.tm_year + 1900 && tmp.data.startMonth > currentDate.tm_mon + 1 ||
+				tmp.data.startYear == currentDate.tm_year + 1900 && tmp.data.startMonth == currentDate.tm_mon + 1 && tmp.data.startDay > currentDate.tm_mday)
 				events.push_back(tmp);
 		}
 	}
-	else if (!filter.futureEvents && !filter.todayEvents && filter.category=="")
+	else if (!filter.futureEvents && !filter.todayEvents && filter.category == "")
 	{
 		while (std::getline(userEventFile, fline))
 		{
@@ -597,7 +609,7 @@ std::vector<event> getFilteredEvents(struct eventsFilter &filter)
 				events.push_back(tmp);
 		}
 	}
-	else if (filter.pastEvents && filter.futureEvents && filter.todayEvents && filter.category!="")
+	else if (filter.pastEvents && filter.futureEvents && filter.todayEvents && filter.category != "")
 	{
 		while (std::getline(userEventFile, fline))
 		{
@@ -605,7 +617,7 @@ std::vector<event> getFilteredEvents(struct eventsFilter &filter)
 			std::getline(iss, feventName, '-');
 			std::getline(iss, fuserID, '\n');
 			tmp = getEvent(feventName);
-			if(tmp.category==filter.category)
+			if (tmp.category == filter.category)
 				events.push_back(tmp);
 		}
 	}
@@ -633,7 +645,7 @@ std::vector<event> getFilteredEvents(struct eventsFilter &filter)
 			events.push_back(tmp);
 		}
 	}
-	else if (filter.todayEvents && filter.pastEvents && filter.category!="")
+	else if (filter.todayEvents && filter.pastEvents && filter.category != "")
 	{
 		while (std::getline(userEventFile, fline))
 		{
@@ -648,7 +660,7 @@ std::vector<event> getFilteredEvents(struct eventsFilter &filter)
 				events.push_back(tmp);
 		}
 	}
-	else if (filter.todayEvents && filter.futureEvents && filter.category!="")
+	else if (filter.todayEvents && filter.futureEvents && filter.category != "")
 	{
 		while (std::getline(userEventFile, fline))
 		{
@@ -702,7 +714,7 @@ std::vector<event> getFilteredEvents(struct eventsFilter &filter)
 			std::getline(iss, fuserID, '\n');
 			tmp = getEvent(feventName);
 			if ((tmp.data.startDay == currentDate.tm_mday && tmp.data.startMonth == currentDate.tm_mon + 1 && tmp.data.startYear == currentDate.tm_year + 1900) &&
-				tmp.category==filter.category)
+				tmp.category == filter.category)
 				events.push_back(tmp);
 		}
 	}
@@ -749,3 +761,218 @@ std::vector<event> getFilteredEvents(struct eventsFilter &filter)
 	userEventFile.close();
 	return events;
 }
+
+
+
+
+
+
+
+
+void send()
+{
+	while (true)
+	{
+		std::this_thread::sleep_for(std::chrono::milliseconds(200));
+		std::ifstream logInFile("loginRequest.bin", std::ios::binary);
+		std::ifstream addEventRequest("addEventRequest.bin", std::ios::binary);
+		std::ifstream giveQuiz("quizRequest.txt");
+		std::ifstream quizPlayerAnswers("quizAnswers.bin", std::ios::binary);
+		std::ifstream ownEvents("ownEventsRequest.txt");
+		std::ifstream logOutRequest("logOutRequest.txt");
+		std::ifstream banRequest("banRequest.bin", std::ios::binary);
+		std::ifstream changeCategoriesRequest("changeCategoriesRequest.txt");
+		std::ifstream addCategories("addNewCategories.bin", std::ios::binary);
+		std::ifstream checkEvent("getEvent.txt");
+		std::ifstream addCommentRequest("addCommentRequest.bin", std::ios::binary);
+
+		if (logInFile.is_open())
+		{	
+			loginInfo tempInfo;
+			cereal::BinaryInputArchive iarchive(logInFile);
+			iarchive(tempInfo);
+			logInFile.close();
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			remove("loginRequest.bin");
+			
+			loginConfirmation tempConfirmation = login(tempInfo.username, tempInfo.password);
+			
+
+			std::ofstream response("loginRequestAnswer.bin", std::ios::binary);
+			cereal::BinaryOutputArchive oarchive(response);
+			oarchive(tempConfirmation);
+			response.close();
+		}
+		else if (addEventRequest.is_open())
+		{
+			newEvent tempEvent;
+			cereal::BinaryInputArchive iarchive(addEventRequest);
+			iarchive(tempEvent);
+			addEventRequest.close();
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			remove("addEventRequest.bin");
+
+			std::string response;
+			response = addEvent(tempEvent, tempEvent.sessionID);
+			std::ofstream responseFile("addEventAnswer.txt");
+			responseFile << response;
+			responseFile.close();
+		}
+		else if (giveQuiz.is_open())
+		{
+			giveQuiz.close();
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			remove("quizRequest.txt");
+			std::ofstream quizAnswer("quiz.txt", std::ios::binary);
+
+			quiz tempQuiz = getQuizInfo();
+			cereal::BinaryOutputArchive oarchive(quizAnswer);
+			oarchive(tempQuiz);
+
+			quizAnswer.close();
+		}
+		else if (quizPlayerAnswers.is_open())
+		{	
+			quiz playerAnswers;
+			cereal::BinaryInputArchive iarchive(quizPlayerAnswers);
+			iarchive(playerAnswers);
+			quizPlayerAnswers.close();
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			remove("quizAnswers.bin");
+
+			int correct = checkPlayersAnswers(playerAnswers);
+			std::ofstream answer("correctAnswers.txt");
+			answer << correct;
+			answer.close();
+		}
+		/*else if (ownEvents.is_open())
+		{
+			std::string userSessionID;
+			ownEvents >> userSessionID;
+			ownEvents.close();
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			remove("ownEvents.txt");
+
+			std::vector<std::string> usersEventsList;
+			std::ofstream response("ownEventsAnswer.bin", std::ios::binary);
+
+			usersEventsList = getOwnEvents(userSessionID);
+			cereal::BinaryOutputArchive oarchive(response);
+			oarchive(usersEventsList);
+
+			response.close();
+		}*/
+		else if (logOutRequest.is_open())
+		{
+			std::string userSessionID;
+			logOutRequest >> userSessionID;
+			logOutRequest.close();
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			remove("logOutRequest.txt");
+
+			logOut(userSessionID);
+		}
+		else if (banRequest.is_open())
+		{
+			banUserStruct tempStruct;
+			cereal::BinaryInputArchive iarchive(banRequest);
+			iarchive(tempStruct);
+
+			banRequest.close();
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			remove("banRequest.bin");
+			std::string response;
+			
+			if (isAdmin(tempStruct.sessionID))
+			{
+				response = banUser(tempStruct.user2Ban);
+			}
+			else
+				response = "niste administrator";
+
+			std::ofstream responseFile("banRequestAnswer.txt");
+			responseFile << response;
+
+			responseFile.close();
+		}
+		else if (changeCategoriesRequest.is_open())
+		{	
+			changeCategoriesRequest.close();
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			remove("changeCategoriesRequest.txt");
+
+			std::vector<std::string> categories = getCategories();
+
+			std::ofstream response("changeCategoriesResponse.bin", std::ios::binary);
+			cereal::BinaryOutputArchive oarchive(response);
+			oarchive(categories);
+			response.close();
+		}
+		else if (addCategories.is_open())
+		{	
+			std::vector<std::string> categories;
+			std::string userSessionID, temp;
+			cereal::BinaryInputArchive iarchive(addCategories);
+
+			iarchive(categories);
+			addCategories.close();
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			remove("addNewCategories.bin");
+			
+			userSessionID = categories[0];
+			temp = categories.back();
+			categories.back() = categories[0];
+			categories.pop_back();
+
+			if (isAdmin(userSessionID))
+				changeCategories(categories);
+			
+		}
+		
+		else if (checkEvent.is_open())
+		{
+			std::string eventName;
+			checkEvent >> eventName;
+			checkEvent.close();
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			remove("getEvent.txt");
+
+			std::ofstream giveEvent("getEventResponse.bin", std::ios::binary);
+			//struct event getEvent(std::string eventName);
+			event TempEvent = getEvent(eventName);
+
+			cereal::BinaryOutputArchive oarchive(giveEvent);
+			oarchive(TempEvent);
+
+
+			giveEvent.close();
+		}
+		else if (addCommentRequest.is_open())
+		{	
+			addComment tempStruct;
+			cereal::BinaryInputArchive iarchive(addCommentRequest);
+			iarchive(tempStruct);
+			addCommentRequest.close();
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			remove("addCommentRequest.bin");
+			
+
+			std::string  response = eventComment(tempStruct.comment, tempStruct.eventName, tempStruct.sessionID);
+			std::ofstream giveResponse("addCommentResponse.txt");
+			giveResponse << response;
+			giveResponse.close();
+		}
+
+		
+	}
+}
+
+//std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+int main()
+{
+    
+}
+
+// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
+// Debug program: F5 or Debug > Start Debugging menu
+
