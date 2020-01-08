@@ -44,28 +44,6 @@ bool isAdmin(std::string sessionID)
 	return false;
 }
 
-/*std::vector<std::string> getOwnEvents(std::string& sessionID)
-{
-<<<<<<< HEAD
-	session* tmp = authenticate(sessionID);
-	std::string userID = (*tmp).userID, fline, feventName, fuserID;
-	std::vector<std::string> ownEvents;
-	std::ifstream userEventFile("korisnikDogadjaj.txt");
-	while (std::getline(userEventFile, fline))
-	{
-		std::stringstream iss(fline);
-		std::getline(iss, feventName, '-');
-		std::getline(iss, fuserID, '\n');
-		if (fuserID == userID)
-			ownEvents.push_back(feventName);
-	}
-	userEventFile.close();
-	return ownEvents;
-}
-=======
-
-}*/
->>>>>>> 4309e706127acaf3072e59cb078a5da185259e26
 
 loginConfirmation login(std::string username, std::string password)
 {
