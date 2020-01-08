@@ -62,7 +62,6 @@ std::vector<std::string> getOwnEvents(std::string& sessionID)
 	return ownEvents;
 }
 
-
 loginConfirmation login(std::string username, std::string password)
 {
 	loginConfirmation tempConfirmation;
@@ -811,7 +810,7 @@ void send()
 			
 			loginConfirmation tempConfirmation = login(tempInfo.username, tempInfo.password);
 			
-
+			std::cout << "session id is: " << tempConfirmation.sessionID << std::endl;
 			std::ofstream response("loginRequestAnswer.bin", std::ios::binary);
 			cereal::BinaryOutputArchive oarchive(response);
 			oarchive(tempConfirmation);
@@ -849,7 +848,7 @@ void send()
 		{	
 			quiz playerAnswers;
 			cereal::BinaryInputArchive iarchive(quizPlayerAnswers);
-			iarchive(playerAnswers);
+			iarchive(playerAnswers); //problem u ovoj liniji, otkriti sta
 			quizPlayerAnswers.close();
 			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			remove("quizAnswers.bin");
@@ -932,14 +931,23 @@ void send()
 			addCategories.close();
 			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			remove("addNewCategories.bin");
+			//debug
+			for (auto& i : categories)
+				std::cout << i << std::endl;
 			
+			std::cout << std::endl;//debug
+
 			userSessionID = categories[0];
+			std::cout << "session id is: " << userSessionID << std::endl;
 			temp = categories.back();
 			categories.back() = categories[0];
+			categories[0] = temp;
 			categories.pop_back();
 
 			if (isAdmin(userSessionID))
 				changeCategories(categories);
+			
+				
 			
 		}
 		
@@ -984,7 +992,7 @@ void send()
 //std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 int main()
 {
-    
+	send();
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
