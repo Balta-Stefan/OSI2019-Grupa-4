@@ -1,0 +1,1 @@
+cereal, biblioteka za serijalizaciju podataka
