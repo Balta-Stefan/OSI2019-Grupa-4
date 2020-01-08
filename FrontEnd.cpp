@@ -96,7 +96,7 @@ struct loginInfo
 };
 
 
-struct banUser
+struct banUserStruct
 {
 	std::string user2Ban, sessionID;
 
@@ -149,12 +149,12 @@ void dodavanjeDogadjaja()
 	//backend gives answer via a text file called addEventAnswer.txt
 
 	newEvent tempEvent;
-	tempEvent.sessionID = sessionID;
 	tempEvent.notDuplicate = false;
 
 	std::cout << "ime dogadjaja: ";
 	std::cin >> tempEvent.eventData.eventName;
 	std::cout << "kratak opis:" << std::endl;
+	std::cin.ignore();
 	std::getline(std::cin, tempEvent.eventData.shortDescription);
 
 	std::cout << "pocetak (sat)" << " ";
@@ -219,6 +219,7 @@ void dodavanjeDogadjaja()
 	std::cin >> tempEvent.category;
 	std::cout << std::endl;
 
+	std::cin.ignore();
 	std::getline(std::cin, tempEvent.description);
 
 
@@ -243,6 +244,7 @@ void dodavanjeDogadjaja()
 			input >> message;
 
 			input.close();
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			remove("addEventAnswer.txt");
 			std::cout << message;
 		}
@@ -258,6 +260,7 @@ void logIn()
 	const char ENTER = 13;
 
 	std::cout << "unesite korisnicko ime: " << std::endl;
+	std::cin.ignore();
 	std::getline(std::cin, userName);
 	std::cout << std::endl;
 	std::cout << "unesite lozinku: " << std::endl;
@@ -278,6 +281,7 @@ void logIn()
 		}
 
 	}
+	
 
 	loginInfo login;
 	login.password = password;
@@ -319,7 +323,7 @@ void logIn()
 		userRank = tempLoginInfo.userRank;
 		sessionID = tempLoginInfo.sessionID;
 	}
-
+	std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	remove("loginRequestAnswer.bin");
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
@@ -348,6 +352,7 @@ void igrajKviz()
 			iarchive(kviz);
 
 			answer.close();
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			remove("quiz.txt");
 			break;
 		}
@@ -391,6 +396,7 @@ void igrajKviz()
 			validAnswers >> valid;
 			std::cout << "broj ispravnih odgovora: " << valid << std::endl;
 			validAnswers.close();
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			remove("correctAnswers.txt");
 			return;
 		}
@@ -424,6 +430,7 @@ void getEvent(std::string eventName)
 			cereal::BinaryInputArchive iarchive(response);
 			iarchive(tempEvent);
 			response.close();
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			remove("getEventResponse.bin");
 			break;
 		}
@@ -473,6 +480,7 @@ void getEvent(std::string eventName)
 			addComment komentar;
 			//std::string eventComment(std::string comment, std::string eventName, std::string sessionID);
 			std::cout << "unesite komentar:" << std::endl;
+			std::cin.ignore();
 			getline(std::cin, komentar.comment);
 			if (komentar.comment.length() > 400)
 				std::cout << "komentar ne smije biti duži od 400 znakova" << std::endl;
@@ -493,9 +501,11 @@ void getEvent(std::string eventName)
 					if (response.is_open())
 					{
 						std::string answer;
+						std::cin.ignore();
 						std::getline(response, answer);
 						std::cout << "answer" << std::endl;
 						response.close();
+						std::this_thread::sleep_for(std::chrono::milliseconds(100));
 						remove("addCommentResponse.txt");
 						break;
 					}
@@ -538,6 +548,7 @@ void pregledVlastitihDogadaja()
 			cereal::BinaryInputArchive iarchive(response);
 			iarchive(ownEvents);
 			response.close();
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			remove("ownEventsAnswer.bin");
 			break;
 		}
@@ -581,6 +592,7 @@ void banovanjeKorisnika()
 	tempStruct.sessionID = sessionID;
 
 	std::cout << "unesite ime korisnika za banovanje:" << std::endl;
+	std::cin.ignore();
 	std::getline(std::cin, tempStruct.user2Ban);
 	
 
@@ -595,6 +607,7 @@ void banovanjeKorisnika()
 	std::string message;
 	response >> message;
 	response.close();
+	std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	remove("banRequestAnswer.txt");
 
 	std::cout << message << std::endl;
@@ -611,11 +624,11 @@ void banovanjeKorisnika()
 void izmjenaKategorija()
 {
 	std::ofstream file("changeCategoriesRequest.txt");
+	file << sessionID;
 	file.close();
 
 
 	std::vector<std::string> categories;
-	categories.push_back(sessionID);
 	while (true)
 	{
 		std::this_thread::sleep_for(std::chrono::milliseconds(200));
@@ -625,6 +638,7 @@ void izmjenaKategorija()
 			cereal::BinaryInputArchive iarchive(response);
 			iarchive(categories);
 			response.close();
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			remove("changeCategoriesResponse.bin");
 			break;
 		}
@@ -648,7 +662,7 @@ void izmjenaKategorija()
 
 		if (choice == 1)
 		{
-			int toRemove;
+			unsigned int toRemove;
 			std::cout << "unesite redni broj dogadjaja" << std::endl;
 			std::cin >> toRemove;
 			toRemove--;
@@ -665,6 +679,7 @@ void izmjenaKategorija()
 		{
 			std::string newCategory;
 			std::cout << "unesite ime nove kategorije:" << std::endl;
+			std::cin.ignore();
 			std::getline(std::cin, newCategory);
 		}
 		else if (choice == 3)
@@ -687,13 +702,13 @@ void izmjenaKategorija()
 void printMenu()
 {
 	system("cls");
-	std::cout << "1)pregled događaja" << std::endl;
-	std::cout << "2)dodavanje događaja" << std::endl;
+	std::cout << "1)pregled dogadjaja" << std::endl;
+	std::cout << "2)dodavanje dogadjaja" << std::endl;
 	std::cout << "3)igranje kviza" << std::endl;
 
 	if (loggedIn)
 	{
-		std::cout << "4)pregled vlastitih događaja" << std::endl;
+		std::cout << "4)pregled vlastitih dogadjaja" << std::endl;
 		std::cout << "5)izlaz" << std::endl;
 	}
 	else
@@ -729,7 +744,7 @@ int main()
 				dodavanjeDogadjaja();
 				break;
 			case 3:
-				igrajKviz;
+				igrajKviz();
 				break;
 			case 4:
 				if (!loggedIn)
