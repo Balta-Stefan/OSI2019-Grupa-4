@@ -827,9 +827,10 @@ void send()
 
 			std::string response;
 			response = addEvent(tempEvent, tempEvent.sessionID);
-			std::ofstream responseFile("addEventAnswer.txt");
+			std::ofstream responseFile("addEventAnswer2.txt");
 			responseFile << response;
 			responseFile.close();
+			rename("addEventAnswer2.txt", "addEventAnswer.txt");
 		}
 		else if (giveQuiz.is_open())
 		{
@@ -903,10 +904,12 @@ void send()
 			else
 				response = "niste administrator";
 
-			std::ofstream responseFile("banRequestAnswer.txt");
+			std::ofstream responseFile("banRequestAnswer2.txt");
 			responseFile << response;
-
+			
 			responseFile.close();
+			rename("banRequestAnswer2.txt", "banRequestAnswer.txt");
+			std::cout << "renamed" << std::endl;
 		}
 		else if (changeCategoriesRequest.is_open())
 		{	

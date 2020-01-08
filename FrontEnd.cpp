@@ -223,7 +223,9 @@ void dodavanjeDogadjaja()
 	}
 
 	std::cout << "kategorija: ";
-	std::cin >> tempEvent.category;
+	std::cin.ignore();
+	std::getline(std::cin, tempEvent.category);
+	//std::cin >> tempEvent.category;
 	std::cout << std::endl;
 
 	
@@ -250,17 +252,18 @@ void dodavanjeDogadjaja()
 		if (input.is_open())
 		{
 			std::string message;
-			input >> message;
+			std::getline(input, message);
+			//input >> message;
 
 			input.close();
 			std::cout << std::endl;
 			std::cout << message;
 			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 			remove("addEventAnswer.txt");
+			return;
 			
 		}
 
-		input.close();
 	}
 }
 
@@ -615,13 +618,23 @@ void banovanjeKorisnika()
 		oarchive(tempStruct);
 	}
 
-
-	std::ifstream response("banRequestAnswer.txt");
 	std::string message;
-	response >> message;
-	response.close();
-	std::this_thread::sleep_for(std::chrono::milliseconds(100));
-	remove("banRequestAnswer.txt");
+	while (true)
+	{
+		std::this_thread::sleep_for(std::chrono::milliseconds(300));
+		std::ifstream response("banRequestAnswer.txt");
+		if (response.is_open())
+		{
+			std::getline(response, message);
+			response.close();
+			std::this_thread::sleep_for(std::chrono::milliseconds(300));
+			remove("banRequestAnswer.txt");
+			break;
+		}
+	}
+
+	
+	
 
 	std::cout << message << std::endl;
 
@@ -798,6 +811,7 @@ int main()
 					banovanjeKorisnika();
 				else
 					greska();
+				break;
 
 			case 6:
 				if (loggedIn && userRank == 1)
