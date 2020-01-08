@@ -32,6 +32,11 @@ bool isAdmin(std::string sessionID)
 	return false;
 }
 
+std::vector<std::string> getOwnEvents(std::string& sessionID)
+{
+	
+}
+
 loginConfirmation login(std::string username, std::string password)
 {	
 	loginConfirmation tempConfirmation;
