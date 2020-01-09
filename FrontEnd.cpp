@@ -1,4 +1,4 @@
-﻿// FrontEnd.cpp : This file contains the 'main' function. Program execution begins and ends there.
+// FrontEnd.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
 #include <iostream>
@@ -61,12 +61,12 @@ struct addComment
 };
 
 struct eventList
-{	
+{
 	std::string eventName;
 	std::string shortDescription;
-	unsigned short startHour, startMinute, endHour, endMinute, startMonth, startDay, startYear, endMonth, endDay, endYear; 
-	std::string location; 
-	std::vector<std::string>specialRequirements; 
+	unsigned short startHour, startMinute, endHour, endMinute, startMonth, startDay, startYear, endMonth, endDay, endYear;
+	std::string location;
+	std::vector<std::string>specialRequirements;
 
 	template <class Archive>
 	void serialize(Archive& ar)
@@ -76,15 +76,15 @@ struct eventList
 };
 
 struct event
-{	
-	eventList data; 
-	std::string description; 
+{
+	eventList data;
+	std::string description;
 	std::string category;
 
-	
-	std::vector<std::string>userNames; 
-	std::vector<std::string>comments; 
-	std::vector<std::string>commentIDs; 
+
+	std::vector<std::string>userNames;
+	std::vector<std::string>comments;
+	std::vector<std::string>commentIDs;
 
 
 	template <class Archive>
@@ -202,7 +202,7 @@ void izmjenaKviza()
 			quizData.close();
 			remove("editQuizAnswer.bin");
 
-		
+
 
 			if (tempStruct.message.length() > 0) //greska
 			{
@@ -213,16 +213,16 @@ void izmjenaKviza()
 			else
 			{
 				while (true)
-				{	
+				{
 					system("cls");
-					
+
 					for (unsigned int i = 0; i < tempStruct.data.questions.size(); i++)
 					{
 						std::cout << i + 1 << ")" << tempStruct.data.questions[i] << std::endl;
 						char tempC = 'a';
 						for (int j = 0; j < MAXANSWERS; j++)
-							std::cout << "	" << tempC++ << ")" << tempStruct.data.answers[MAXANSWERS*i+j] << std::endl;
-						
+							std::cout << "	" << tempC++ << ")" << tempStruct.data.answers[MAXANSWERS * i + j] << std::endl;
+
 						std::cout << "Ispravni odgovor: " << tempStruct.data.answers[tempStruct.data.rightAnswers[i]] << std::endl; //ovo se kvari kada se uklanjaju elementi
 						std::cout << std::endl;
 					}
@@ -258,25 +258,25 @@ void izmjenaKviza()
 							std::cin >> correctAnswer;
 						} while ((correctAnswer < 1) || (correctAnswer > MAXANSWERS));
 						tempStruct.data.rightAnswers.push_back(tempSize + correctAnswer);
-						
-						
-						
+
+
+
 					}
 					else if ((choice == 2) && (tempStruct.data.questions.size() > 0)) //brisanje pitanja, mozda neispravno
 					{
 						std::cout << "Koje pitanje obrisati? (pitanja su numerisana od 1)" << std::endl;
 						unsigned short toDelete;
 						std::cin >> toDelete;
-				
+
 
 						if ((toDelete > 0) && (toDelete <= tempStruct.data.questions.size()))
 						{
 							toDelete--;
 
 							tempStruct.data.questions.erase(tempStruct.data.questions.begin() + toDelete);
-							
-							for(int i = 0; i < MAXANSWERS; i++)
-								tempStruct.data.answers.erase(tempStruct.data.answers.begin() + toDelete*MAXANSWERS); 
+
+							for (int i = 0; i < MAXANSWERS; i++)
+								tempStruct.data.answers.erase(tempStruct.data.answers.begin() + toDelete * MAXANSWERS);
 							for (unsigned int k = toDelete; k < tempStruct.data.rightAnswers.size(); k++)
 								tempStruct.data.rightAnswers[k] -= MAXANSWERS;
 							tempStruct.data.rightAnswers.erase(tempStruct.data.rightAnswers.begin() + toDelete); //ova linija je problem
@@ -379,10 +379,10 @@ void dodavanjeDogadjaja()
 	std::cin.ignore();
 
 	for (int i = 0; i < brojZahtjeva; i++)
-	{	
+	{
 		std::cout << "Unesite poseban zahtjev: " << std::endl;
 		std::string temp;
-		
+
 		std::getline(std::cin, temp);
 		tempEvent.eventData.specialRequirements.push_back(temp);
 	}
@@ -393,7 +393,7 @@ void dodavanjeDogadjaja()
 	//std::cin >> tempEvent.category;
 	std::cout << std::endl;
 
-	
+
 	std::cout << "Unesite opis dogadjaja: " << std::endl;
 	//std::cin.ignore();
 	std::getline(std::cin, tempEvent.description);
@@ -426,14 +426,14 @@ void dodavanjeDogadjaja()
 			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 			remove("addEventAnswer.txt");
 			return;
-			
+
 		}
 
 	}
 }
 
 void logIn()
-{	
+{
 	std::string userName, password;
 	char tempChar;
 	const char ENTER = 13;
@@ -460,7 +460,7 @@ void logIn()
 		}
 
 	}
-	
+
 
 	loginInfo login;
 	login.password = password;
@@ -486,20 +486,20 @@ void logIn()
 		{
 			cereal::BinaryInputArchive iarchive(fajl);
 			iarchive(tempLoginInfo);
-			
+
 			fajl.close();
 			break;
 		}
 
 		fajl.close();
-		
+
 	}
 
 	std::cout << std::endl;
 	std::cout << tempLoginInfo.message << std::endl;
-	
+
 	if (tempLoginInfo.sessionID.length() > 0)
-	{	
+	{
 		loggedIn = true;
 		userRank = tempLoginInfo.userRank;
 		sessionID = tempLoginInfo.sessionID;
@@ -512,7 +512,7 @@ void logIn()
 }
 
 void igrajKviz()
-{	
+{
 	//backend gives answer via quiz.txt, format is: num of lines \n all questions then all answers (each entry is in new line)
 
 	std::ofstream request("quizRequest2.txt");
@@ -551,9 +551,9 @@ void igrajKviz()
 
 		short answer;
 		std::cin >> answer;
-		tempKviz.answers.push_back(kviz.answers[(answer-1)+i*3]);
+		tempKviz.answers.push_back(kviz.answers[(answer - 1) + i * 3]);
 	}
-	
+
 
 
 
@@ -566,7 +566,7 @@ void igrajKviz()
 		giveAnswers.close();
 	}
 
-	
+
 	while (true)
 	{
 		std::this_thread::sleep_for(std::chrono::milliseconds(200));
@@ -629,7 +629,7 @@ void getEvent(std::string eventName)
 		{
 			std::cout << "Posebni zahtjevi: " << std::endl;
 			for (auto& i : tempEvent.data.specialRequirements)
-				std::cout <<"	-"<< i << std::endl;
+				std::cout << i << std::endl;
 		}
 
 		std::cout << "Kategorija: " << tempEvent.category << std::endl;
@@ -669,7 +669,7 @@ void getEvent(std::string eventName)
 			std::cin.ignore();
 			getline(std::cin, komentar.comment);
 			if (komentar.comment.length() > 400)
-				std::cout << "Komentar ne smije biti duži od 400 znakova" << std::endl;
+				std::cout << "komentar ne smije biti du�i od 400 znakova" << std::endl;
 			else
 			{
 				komentar.eventName = eventName;
@@ -745,7 +745,7 @@ void getEvent(std::string eventName)
 		}
 		else
 		{
-			std::cout << "greska" << std::endl;
+			std::cout << "Greska" << std::endl;
 		}
 
 	}
@@ -757,10 +757,11 @@ void getEvent(std::string eventName)
 
 void pregledDogadjaja()
 {
-	
+
 	system("cls");
 	eventsFilter tempStruct;
 	short tempChar;
+
 	std::cout << "Pregledati prosle dogadjaje (0/1)?" << std::endl;
 	std::cin >> tempChar;
 	if (tempChar == 1)
@@ -812,10 +813,10 @@ void pregledDogadjaja()
 			break;
 	}
 
-	
-	if(choice != 0)
+
+	if (choice != 0)
 		tempStruct.category = categories[choice - 1];
-	
+
 
 	std::ofstream request("checkEvents2.bin");
 	cereal::BinaryOutputArchive oarchive(request);
@@ -844,15 +845,11 @@ void pregledDogadjaja()
 	while (true)
 	{
 		system("cls");
-		
+
 
 		for (unsigned int i = 0; i < events.size(); i++)
 		{
 			std::cout << i + 1 << std::endl;
-			std::cout << "Ime: "  << events[i].data.eventName << std::endl;
-			std::cout << "Kratak opis: " <<events[i].data.shortDescription << std::endl;
-			std::cout << "Lokacija: " << events[i].data.location << std::endl;
-			std::cout << "Kategorija: " << events[i].category << std::endl;
 			std::cout << "Ime: " << events[i].data.eventName << std::endl;
 			std::cout << "Kratak opis: " << std::endl << events[i].data.shortDescription << std::endl;
 			std::cout << "Lokacija: " << events[i].data.location << std::endl;
@@ -862,17 +859,17 @@ void pregledDogadjaja()
 				std::cout << "Posebni zahtjevi: " << std::endl;
 
 				for (unsigned int j = 0; j < events[i].data.specialRequirements.size() - 1; j++)
-					std::cout <<"	-"<< events[i].data.specialRequirements[j] << std::endl;
-				std::cout << "	-"<<events[i].data.specialRequirements.back() << std::endl;
+					std::cout << events[i].data.specialRequirements[j] << ", ";
+				std::cout << events[i].data.specialRequirements.back() << std::endl;
 			}
-			
+
 		}
 
 		std::cout << "1)Nazad" << std::endl;
 		std::cout << "2)Odaberi dogadjaj" << std::endl;
 		std::cout << std::endl;
 
-		
+
 
 		do
 		{
@@ -885,11 +882,11 @@ void pregledDogadjaja()
 		{
 			unsigned short chooseEvent;
 			do
-			{	
-				std::cout << "odaberite redni broj dogadjaja: " << std::endl;
-				std::cin >> chooseEvent;	
+			{
+				std::cout << "Odaberite redni broj dogadjaja: " << std::endl;
+				std::cin >> chooseEvent;
 			} while ((chooseEvent < 1) || (chooseEvent > events.size()) && (events.size() > 0));
-			
+
 			std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 			getEvent(events[chooseEvent - 1].data.eventName);
 		}
@@ -908,7 +905,7 @@ void logOut()
 }
 
 void pregledVlastitihDogadaja()
-{	
+{
 	system("cls");
 	std::ofstream file("ownEventsRequest.txt");
 	file << sessionID;
@@ -932,9 +929,9 @@ void pregledVlastitihDogadaja()
 	}
 
 	while (true)
-	{	
+	{
 		for (unsigned int i = 0; i < ownEvents.size(); i++)
-			std::cout << i+1 << ")" << ownEvents[i] << std::endl;
+			std::cout << i + 1 << ")" << ownEvents[i] << std::endl;
 
 		std::cout << std::endl;
 		int response;
@@ -945,7 +942,7 @@ void pregledVlastitihDogadaja()
 		if (response == 1)
 		{
 			unsigned int event;
-			std::cout << "unesite redni broj dogadjaja" << std::endl;
+			std::cout << "Unesite redni broj dogadjaja" << std::endl;
 			std::cin >> event;
 			if ((event > 0) && (event <= ownEvents.size()))
 			{
@@ -954,7 +951,7 @@ void pregledVlastitihDogadaja()
 			}
 			else
 				greska();
-			
+
 		}
 		else if (response == 2)
 		{
@@ -975,7 +972,7 @@ void banovanjeKorisnika()
 	std::cout << "Unesite ime korisnika za banovanje:" << std::endl;
 	std::cin.ignore();
 	std::getline(std::cin, tempStruct.user2Ban);
-	
+
 
 	{
 		std::ofstream file("banRequest.bin", std::ios::binary);
@@ -998,8 +995,8 @@ void banovanjeKorisnika()
 		}
 	}
 
-	
-	
+
+
 
 	std::cout << message << std::endl;
 
@@ -1013,7 +1010,7 @@ void banovanjeKorisnika()
 
 
 void izmjenaKategorija()
-{	
+{
 	std::cout << "";
 	system("cls");
 	std::ofstream file("changeCategoriesRequest.txt");
@@ -1022,7 +1019,7 @@ void izmjenaKategorija()
 
 
 	std::vector<std::string> categories;
-	
+
 
 	while (true)
 	{
@@ -1045,31 +1042,31 @@ void izmjenaKategorija()
 	std::string temp = categories[0];
 	categories[0] = sessionID;
 	categories.push_back(temp);
-	
+
 	while (true)
-	{	
+	{
 		system("cls");
 		int counter = 1;
 		int choice;
 		for (auto& category : categories)
 			if (category == categories[0])
 				continue;
-			else 
+			else
 				std::cout << counter++ << ")" << category << std::endl;
-		
+
 		std::cout << std::endl;
 		std::cout << "1)Obrisi" << std::endl;
 		std::cout << "2)Dodaj" << std::endl;
 		std::cout << "3)Izlaz" << std::endl;
 		std::cin >> choice;
-	
+
 
 		if (choice == 1)
 		{
 			unsigned int toRemove;
 			std::cout << "Unesite redni broj kategorije" << std::endl;
 			std::cin >> toRemove;
-			
+
 
 			if ((toRemove > 0) && (toRemove < categories.size()) && (categories.size() > 0))
 			{
@@ -1090,20 +1087,20 @@ void izmjenaKategorija()
 		}
 		else if (choice == 3)
 			break;
-			
+
 		else
 			greska();
-		
+
 	}
 
 	std::cin.ignore();
-	{	
+	{
 		std::ofstream file("addNewCategories.bin", std::ios::binary);
 		cereal::BinaryOutputArchive oarchive(file);
 		oarchive(categories);
 	}
 
-	
+
 
 }
 
@@ -1128,7 +1125,7 @@ void printMenu()
 		std::cout << "6)Izmjena kategorija" << std::endl;
 		std::cout << "7)Izmjena kviza" << std::endl;
 	}
-	
+
 
 }
 
@@ -1140,57 +1137,57 @@ int main()
 {
 	bool run = true;
 	while (run)
-	{	
+	{
 		printMenu();
 		short input;
 		std::cin >> input;
 		switch (input)
-		{	
-			case 0:
-				run = false;
-				if (loggedIn)
-					logOut();
-				break;
-			case 1:
-				pregledDogadjaja();
-				break;
-			case 3:
-				if (loggedIn)
-					dodavanjeDogadjaja();
-				else
-					logIn();
-				break;
-			case 2:
-				igrajKviz();
-				break;
-			case 4:
-				if (!loggedIn)
-					logIn();
-				else
-					pregledVlastitihDogadaja();
-				break;
-			case 5:
-				if (loggedIn && userRank == 1)
-					banovanjeKorisnika();
-				else
-					greska();
-				break;
-
-			case 6:
-				if (loggedIn && userRank == 1)
-					izmjenaKategorija();
-				else
-					greska();
-				break;
-			case 7:
-				if (loggedIn && userRank == 1)
-					izmjenaKviza();
-				else
-					greska();
-				break;
-
-			default:
+		{
+		case 0:
+			run = false;
+			if (loggedIn)
+				logOut();
+			break;
+		case 1:
+			pregledDogadjaja();
+			break;
+		case 3:
+			if (loggedIn)
+				dodavanjeDogadjaja();
+			else
+				logIn();
+			break;
+		case 2:
+			igrajKviz();
+			break;
+		case 4:
+			if (!loggedIn)
+				logIn();
+			else
+				pregledVlastitihDogadaja();
+			break;
+		case 5:
+			if (loggedIn && userRank == 1)
+				banovanjeKorisnika();
+			else
 				greska();
+			break;
+
+		case 6:
+			if (loggedIn && userRank == 1)
+				izmjenaKategorija();
+			else
+				greska();
+			break;
+		case 7:
+			if (loggedIn && userRank == 1)
+				izmjenaKviza();
+			else
+				greska();
+			break;
+
+		default:
+			greska();
 		}
 
 	}

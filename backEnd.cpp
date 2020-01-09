@@ -261,7 +261,7 @@ void editQuiz(struct quiz& newQuiz)
 	for (i = 0; i < tempVar; i++)
 		quizQuestions << newQuiz.questions[i] << "-";
 	for (i = 0; i < tempVar2; i++)
-		if (i == tempVar2 -1)
+		if (i == tempVar2 - 1)
 			quizQuestions << newQuiz.answers[i] << "\n";
 		else
 			quizQuestions << newQuiz.answers[i] << "-";
@@ -311,9 +311,13 @@ void changeCategories(std::vector<std::string> newCategories)
 
 	}
 	std::ofstream categories("kategorije.txt");
-	for (i = 0; i < newCategories.size() - 1; i++)
-		categories << newCategories[i] << "-";
-	categories << newCategories[i];
+	if (newCategories.size() > 0)
+	{
+		for (i = 0; i < newCategories.size() - 1; i++)
+			categories << newCategories[i] << "-";
+		categories << newCategories[i];
+	}
+
 }
 
 struct quiz4Players getQuestions4Player()
@@ -321,10 +325,10 @@ struct quiz4Players getQuestions4Player()
 	struct quiz quizInfo;
 	struct quiz4Players quizForPlayers;
 	quizInfo = getQuizInfo();
-	int i;
-	for (i = 0; i < 10; i++)
+	unsigned int i;
+	for (i = 0; i < quizForPlayers.questions.size(); i++)
 		quizForPlayers.questions.push_back(quizInfo.questions[i]);
-	for (i = 0; i < 30; i++)
+	for (i = 0; i < quizForPlayers.answers.size(); i++)
 		quizForPlayers.answers.push_back(quizInfo.answers[i]);
 	return quizForPlayers;
 }
@@ -378,7 +382,7 @@ std::string removeComment(std::string commentID, std::string eventName)
 }
 
 struct event getEvent(std::string eventName)
-{	
+{
 	std::ifstream userEvent("korisnikDogadjaj.txt");
 	std::string fline, fuserID, fevent;
 	int flag = 0;
@@ -815,16 +819,16 @@ void send()
 		std::ifstream pushEvents("checkEvents.bin", std::ios::binary);
 
 		if (logInFile.is_open())
-		{	
+		{
 			loginInfo tempInfo;
 			cereal::BinaryInputArchive iarchive(logInFile);
 			iarchive(tempInfo);
 			logInFile.close();
 			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			remove("loginRequest.bin");
-			
+
 			loginConfirmation tempConfirmation = login(tempInfo.username, tempInfo.password);
-			
+
 			std::cout << "session id is: " << tempConfirmation.sessionID << std::endl;
 			std::ofstream response("loginRequestAnswer.bin", std::ios::binary);
 			cereal::BinaryOutputArchive oarchive(response);
@@ -862,7 +866,7 @@ void send()
 			rename("quiz2.bin", "quiz.bin");
 		}
 		else if (quizPlayerAnswers.is_open())
-		{	
+		{
 			quiz playerAnswers;
 			cereal::BinaryInputArchive iarchive(quizPlayerAnswers);
 			iarchive(playerAnswers); //problem u ovoj liniji, otkriti sta
@@ -913,7 +917,7 @@ void send()
 			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			remove("banRequest.bin");
 			std::string response;
-			
+
 			if (isAdmin(tempStruct.sessionID))
 			{
 				response = banUser(tempStruct.user2Ban);
@@ -923,13 +927,13 @@ void send()
 
 			std::ofstream responseFile("banRequestAnswer2.txt");
 			responseFile << response;
-			
+
 			responseFile.close();
 			rename("banRequestAnswer2.txt", "banRequestAnswer.txt");
 			std::cout << "renamed" << std::endl;
 		}
 		else if (changeCategoriesRequest.is_open())
-		{	
+		{
 			changeCategoriesRequest.close();
 			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			remove("changeCategoriesRequest.txt");
@@ -942,7 +946,7 @@ void send()
 			response.close();
 		}
 		else if (addCategories.is_open())
-		{	
+		{
 			std::vector<std::string> categories;
 			std::string userSessionID, temp;
 			cereal::BinaryInputArchive iarchive(addCategories);
@@ -951,14 +955,10 @@ void send()
 			addCategories.close();
 			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			remove("addNewCategories.bin");
-			//debug
-			for (auto& i : categories)
-				std::cout << i << std::endl;
-			
-			std::cout << std::endl;//debug
+
 
 			userSessionID = categories[0];
-			std::cout << "session id is: " << userSessionID << std::endl;
+
 			temp = categories.back();
 			categories.back() = categories[0];
 			categories[0] = temp;
@@ -966,11 +966,11 @@ void send()
 
 			if (isAdmin(userSessionID))
 				changeCategories(categories);
-			
-				
-			
+
+
+
 		}
-		
+
 		else if (checkEvent.is_open())
 		{
 			std::string eventName;
@@ -992,14 +992,14 @@ void send()
 			rename("getEventResponse2.bin", "getEventResponse.bin");
 		}
 		else if (addCommentRequest.is_open())
-		{	
+		{
 			addComment tempStruct;
 			cereal::BinaryInputArchive iarchive(addCommentRequest);
 			iarchive(tempStruct);
 			addCommentRequest.close();
 			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			remove("addCommentRequest.bin");
-			
+
 
 			std::string  response = eventComment(tempStruct.comment, tempStruct.eventName, tempStruct.sessionID);
 			std::ofstream giveResponse("addCommentResponse2.txt");
@@ -1022,7 +1022,7 @@ void send()
 			remove("removeCommentRequest.bin");
 
 			std::ofstream response("response2.txt");
-			
+
 			if (isAdmin(tempStruct.sessionID))
 			{
 				std::string answer = removeComment(tempStruct.commentID, tempStruct.eventName);
@@ -1063,7 +1063,7 @@ void send()
 			quiz tempStruct;
 			cereal::BinaryInputArchive iarchive(newQuiz);
 			iarchive(tempStruct);
-			
+
 			newQuiz.close();
 			remove("newQuiz.bin");
 
@@ -1087,7 +1087,7 @@ void send()
 			response.close();
 			rename("eventsList2.bin", "eventsList.bin");
 		}
-		
+
 	}
 }
 
