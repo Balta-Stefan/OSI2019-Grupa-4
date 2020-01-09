@@ -321,10 +321,10 @@ struct quiz4Players getQuestions4Player()
 	struct quiz quizInfo;
 	struct quiz4Players quizForPlayers;
 	quizInfo = getQuizInfo();
-	unsigned int i;
-	for (i = 0; i < quizForPlayers.questions.size(); i++)
+	int i;
+	for (i = 0; i < 10; i++)
 		quizForPlayers.questions.push_back(quizInfo.questions[i]);
-	for (i = 0; i < quizForPlayers.answers.size(); i++)
+	for (i = 0; i < 30; i++)
 		quizForPlayers.answers.push_back(quizInfo.answers[i]);
 	return quizForPlayers;
 }
