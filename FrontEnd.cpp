@@ -16,6 +16,7 @@
 
 //VAZNA NAPOMENA, ZABRANITI DODAVANJE DOGADJAJA SA ISTIM IMENOM
 
+
 unsigned short MAXQUESTIONS = 10; //max broj pitanja za kviz
 unsigned short MAXANSWERS = 3; //max broj odgovora
 std::string sessionID = "";
@@ -23,6 +24,20 @@ int userRank = 0;
 bool loggedIn = false;
 
 std::string successfulLogOut = "Uspjesno odjavljivanje.";
+
+
+struct eventsFilter
+{
+	bool todayEvents, futureEvents, pastEvents;
+	std::string category;
+
+	eventsFilter() { todayEvents = futureEvents = pastEvents = false; category = ""; }
+	template <class Archive>
+	void serialize(Archive& ar)
+	{
+		ar(todayEvents, futureEvents, pastEvents, category);
+	}
+};
 
 struct removeCommentStruct
 {
@@ -200,17 +215,15 @@ void izmjenaKviza()
 				while (true)
 				{	
 					system("cls");
+					
 					for (unsigned int i = 0; i < tempStruct.data.questions.size(); i++)
 					{
 						std::cout << i + 1 << ")" << tempStruct.data.questions[i] << std::endl;
 						char tempC = 'a';
 						for (int j = 0; j < MAXANSWERS; j++)
-							std::cout << "	" << tempC++ << ")" << tempStruct.data.answers[i+j] << std::endl;
+							std::cout << "	" << tempC++ << ")" << tempStruct.data.answers[MAXANSWERS*i+j] << std::endl;
 						
-						
-						//std::cout << "	b)" << tempStruct.data.answers[i+1]<< std::endl;
-						//std::cout << "	c)" << tempStruct.data.answers[i+2] << std::endl;
-						std::cout << "ispravni odgovor: " << tempStruct.data.answers[tempStruct.data.rightAnswers[i]] << std::endl;
+						std::cout << "ispravni odgovor: " << tempStruct.data.answers[tempStruct.data.rightAnswers[i]] << std::endl; //ovo se kvari kada se uklanjaju elementi
 						std::cout << std::endl;
 					}
 					std::cout << "1)dodaj pitanje" << std::endl;
@@ -222,18 +235,20 @@ void izmjenaKviza()
 					if ((choice == 1) && (tempStruct.data.questions.size() < MAXQUESTIONS))
 					{
 						std::string question;
-						std::vector<std::string>answers;
 						short correctAnswer;
+						int tempSize = tempStruct.data.answers.size() - 1;
 
 						std::cout << "unesite pitanje:" << std::endl; //mozda potreban cin.ignore()
+						std::cin.ignore();
 						std::getline(std::cin, question);
+						tempStruct.data.questions.push_back(question);
 
 						for (int i = 0; i < MAXANSWERS; i++)
 						{
 							std::string temp;
 							std::cout << "unesite odgovor " << i + 1 << ":" << std::endl; //mozda potreban cin.ignore()
 							std::getline(std::cin, temp);
-							answers.push_back(temp);
+							tempStruct.data.answers.push_back(temp);
 						}
 
 						std::cout << "odgovori na pitanja su numerisana od 1 do " << MAXANSWERS << std::endl;
@@ -241,10 +256,10 @@ void izmjenaKviza()
 						{
 							std::cout << "odaberite ispravan odgovor za pitanje " << ":" << std::endl;
 							std::cin >> correctAnswer;
-						} while ((correctAnswer < 1) && (correctAnswer > MAXANSWERS));
-						tempStruct.data.questions.push_back(question);
-						for (auto& i : answers)
-							tempStruct.data.answers.push_back(i);
+						} while ((correctAnswer < 1) || (correctAnswer > MAXANSWERS));
+						tempStruct.data.rightAnswers.push_back(tempSize + correctAnswer);
+						
+						
 						
 					}
 					else if ((choice == 2) && (tempStruct.data.questions.size() > 0)) //brisanje pitanja, mozda neispravno
@@ -261,7 +276,9 @@ void izmjenaKviza()
 							tempStruct.data.questions.erase(tempStruct.data.questions.begin() + toDelete);
 							
 							for(int i = 0; i < MAXANSWERS; i++)
-								tempStruct.data.answers.erase(tempStruct.data.answers.begin() + toDelete*MAXANSWERS); //MOZDA NEISPRAVNO
+								tempStruct.data.answers.erase(tempStruct.data.answers.begin() + toDelete*MAXANSWERS); 
+							for (unsigned int k = toDelete; k < tempStruct.data.rightAnswers.size(); k++)
+								tempStruct.data.rightAnswers[k] -= MAXANSWERS;
 							tempStruct.data.rightAnswers.erase(tempStruct.data.rightAnswers.begin() + toDelete); //ova linija je problem
 						}
 						else
@@ -496,9 +513,9 @@ void igrajKviz()
 {	
 	//backend gives answer via quiz.txt, format is: num of lines \n all questions then all answers (each entry is in new line)
 
-	std::ofstream request("quizRequest.txt");
+	std::ofstream request("quizRequest2.txt");
 	request.close();
-	
+	rename("quizRequest2.txt", "quizRequest.txt");
 
 	quiz kviz;
 
@@ -506,7 +523,7 @@ void igrajKviz()
 	{
 		std::this_thread::sleep_for(std::chrono::milliseconds(200));
 		std::ifstream answer;
-		answer.open("quiz.txt", std::ios::in);
+		answer.open("quiz.bin", std::ios::binary);
 		if (answer.is_open())
 		{
 			cereal::BinaryInputArchive iarchive(answer);
@@ -514,7 +531,7 @@ void igrajKviz()
 
 			answer.close();
 			std::this_thread::sleep_for(std::chrono::milliseconds(100));
-			remove("quiz.txt");
+			remove("quiz.bin");
 			break;
 		}
 		answer.close();
@@ -570,15 +587,6 @@ void igrajKviz()
 
 }
 
-void pregledDogadjaja()
-{
-	std::ofstream request("showEvents2.txt");
-	request.close();
-	rename("showEvents2.txt", "showEvents.txt");
-
-
-}
-
 void getEvent(std::string eventName)
 {
 
@@ -604,12 +612,12 @@ void getEvent(std::string eventName)
 				break;
 			}
 		}
-	
 
-	
+
+
 		system("cls");
 		std::cout << "ime dogadjaja: " << tempEvent.data.eventName << std::endl;
-		std::cout << "trajanje dogadjaja: " << 
+		std::cout << "trajanje dogadjaja: " <<
 			tempEvent.data.startDay << "." << tempEvent.data.startMonth << "." << tempEvent.data.startYear << " " <<
 			tempEvent.data.startHour << ":" << tempEvent.data.startMinute << "-" <<
 			tempEvent.data.endDay << "." << tempEvent.data.endMonth << "." << tempEvent.data.endYear << " " <<
@@ -628,15 +636,15 @@ void getEvent(std::string eventName)
 
 		std::cout << "komentari:" << std::endl;
 		for (unsigned int i = 0; i < tempEvent.userNames.size(); i++)
-		{	
+		{
 			std::cout << i + 1 << ")";
 			std::cout << tempEvent.userNames[i] << std::endl;
 			std::cout << tempEvent.comments[i] << std::endl;
 		}
 
-	
+
 		std::cout << std::endl;
-	
+
 		std::cout << "1)izlaz" << std::endl;
 		std::cout << "2)dodaj komentar" << std::endl;
 		if (userRank == 1)
@@ -652,7 +660,7 @@ void getEvent(std::string eventName)
 			break;
 		}
 		else if (answer == 2)
-		{	
+		{
 			addComment komentar;
 			//std::string eventComment(std::string comment, std::string eventName, std::string sessionID);
 			std::cout << "unesite komentar:" << std::endl;
@@ -661,7 +669,7 @@ void getEvent(std::string eventName)
 			if (komentar.comment.length() > 400)
 				std::cout << "komentar ne smije biti duži od 400 znakova" << std::endl;
 			else
-			{	
+			{
 				komentar.eventName = eventName;
 				komentar.sessionID = sessionID;
 
@@ -731,19 +739,160 @@ void getEvent(std::string eventName)
 			else
 				greska();
 
-			
+
 		}
 		else
 		{
 			std::cout << "greska" << std::endl;
 		}
-		
+
 	}
-	
+
 
 
 
 }
+
+void pregledDogadjaja()
+{
+	
+	system("cls");
+	eventsFilter tempStruct;
+	char tempChar;
+
+	std::cout << "pregledati prosle dogadjaje (0/1)?" << std::endl;
+	std::cin >> tempChar;
+	if (tempChar == 1)
+		tempStruct.pastEvents = true;
+
+	std::cout << "pregledati danasnje dogadjaje (0/1)?" << std::endl;
+	std::cin >> tempChar;
+	if (tempChar == 1)
+		tempStruct.todayEvents = true;
+
+
+	std::cout << "pregledati buduce dogadjaje (0/1)?" << std::endl;
+	std::cin >> tempChar;
+	if (tempChar == 1)
+		tempStruct.futureEvents = true;
+
+	std::ofstream getCategories("changeCategoriesRequest2.txt");
+	getCategories.close();
+	rename("changeCategoriesRequest2.txt", "changeCategoriesRequest.txt");
+
+	std::vector<std::string> categories;
+
+	while (true)
+	{
+		std::this_thread::sleep_for(std::chrono::milliseconds(200));
+		std::ifstream getCategories("changeCategoriesResponse.bin", std::ios::binary);
+		if (getCategories.is_open())
+		{
+			cereal::BinaryInputArchive iarchive(getCategories);
+			iarchive(categories);
+
+			getCategories.close();
+			remove("changeCategoriesResponse.bin");
+			break;
+		}
+	}
+
+	std::cout << "kategorije: " << std::endl;
+	for (unsigned int i = 0; i < categories.size(); i++)
+		std::cout << i + 1 << ")" << categories[i] << std::endl;
+
+	std::cout << std::endl;
+	unsigned short choice;
+	while ((categories.size() > 0))
+	{
+		std::cout << "koju kategoriju zelite odabrati? (0 za nijednu)" << std::endl;
+		std::cin >> choice;
+		if ((choice > 0) && (choice <= categories.size()))
+			break;
+	}
+
+	
+	if(choice != 0)
+		tempStruct.category = categories[choice - 1];
+	
+
+	std::ofstream request("checkEvents2.bin");
+	cereal::BinaryOutputArchive oarchive(request);
+	oarchive(tempStruct);
+	request.close();
+	rename("checkEvents2.bin", "checkEvents.bin");
+
+
+	std::vector<event> events;
+	while (true)
+	{
+		std::this_thread::sleep_for(std::chrono::milliseconds(200));
+		std::ifstream eventList("eventsList.bin", std::ios::binary);
+		if (eventList.is_open())
+		{
+			cereal::BinaryInputArchive iarchive(eventList);
+			iarchive(events);
+
+			eventList.close();
+			remove("eventsList.bin");
+			break;
+		}
+	}
+
+	//ispisati dogadjaje
+	while (true)
+	{
+		system("cls");
+		
+
+		for (unsigned int i = 0; i < events.size(); i++)
+		{
+			std::cout << i + 1 << std::endl;
+			std::cout << "ime: " << std::endl << events[i].data.eventName << std::endl;
+			std::cout << "kratak opis: " << std::endl << events[i].data.shortDescription << std::endl;
+			std::cout << "lokacija: " << events[i].data.location << std::endl;
+			std::cout << "kategorija: " << events[i].category << std::endl;
+			if (events[i].data.specialRequirements.size() > 0)
+			{
+				std::cout << "posebni zahtjevi: " << std::endl;
+
+				for (unsigned int j = 0; j < events[i].data.specialRequirements.size() - 1; j++)
+					std::cout << events[i].data.specialRequirements[j] << ", ";
+				std::cout << events[i].data.specialRequirements.back() << std::endl;
+			}
+			
+		}
+
+		std::cout << "1)nazad" << std::endl;
+		std::cout << "2)odaberi dogadjaj" << std::endl;
+		std::cout << std::endl;
+
+		
+
+		do
+		{
+			std::cin >> choice;
+		} while ((choice < 1) || (choice > 2));
+
+		if (choice == 1)
+			return;
+		else
+		{
+			unsigned short chooseEvent;
+			do
+			{	
+				std::cout << "odaberite redni broj dogadjaja: " << std::endl;
+				std::cin >> chooseEvent;	
+			} while ((chooseEvent < 1) || (chooseEvent > events.size()));
+			
+			std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+			getEvent(events[chooseEvent - 1].data.eventName);
+		}
+	}
+
+}
+
+
 
 void logOut()
 {

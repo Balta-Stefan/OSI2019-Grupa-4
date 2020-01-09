@@ -31,11 +31,6 @@ struct quiz4Players
 
 
 
-struct eventsFilter
-{
-	bool todayEvents, futureEvents, pastEvents;
-	std::string category;
-};
 
 
 

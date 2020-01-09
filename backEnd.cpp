@@ -812,6 +812,7 @@ void send()
 		std::ifstream removeCommentRequest("removeCommentRequest.bin", std::ios::binary);
 		std::ifstream editQuizRequest("editQuizRequest.txt");
 		std::ifstream newQuiz("newQuiz.bin", std::ios::binary);
+		std::ifstream pushEvents("checkEvents.bin", std::ios::binary);
 
 		if (logInFile.is_open())
 		{	
@@ -851,13 +852,14 @@ void send()
 			giveQuiz.close();
 			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			remove("quizRequest.txt");
-			std::ofstream quizAnswer("quiz.txt", std::ios::binary);
+			std::ofstream quizAnswer("quiz2.bin", std::ios::binary);
 
 			quiz tempQuiz = getQuizInfo();
 			cereal::BinaryOutputArchive oarchive(quizAnswer);
 			oarchive(tempQuiz);
 
 			quizAnswer.close();
+			rename("quiz2.bin", "quiz.bin");
 		}
 		else if (quizPlayerAnswers.is_open())
 		{	
@@ -1066,6 +1068,24 @@ void send()
 			remove("newQuiz.bin");
 
 			editQuiz(tempStruct);
+		}
+		else if (pushEvents.is_open())
+		{
+			eventsFilter tempFilter;
+			cereal::BinaryInputArchive iarchive(pushEvents);
+			iarchive(tempFilter);
+
+			pushEvents.close();
+			remove("checkEvents.bin");
+
+			std::ofstream response("eventsList2.bin", std::ios::binary);
+			std::vector<event> events = getFilteredEvents(tempFilter);
+
+			cereal::BinaryOutputArchive oarchive(response);
+			oarchive(events);
+
+			response.close();
+			rename("eventsList2.bin", "eventsList.bin");
 		}
 		
 	}

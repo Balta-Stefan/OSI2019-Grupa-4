@@ -1,7 +1,18 @@
 #ifndef COMMONSTRUCTURES_H_INCLUDED
 #define COMMONSTRUCTURES_H_INCLUDED
 
+struct eventsFilter
+{
+	bool todayEvents, futureEvents, pastEvents;
+	std::string category;
 
+	eventsFilter() { todayEvents = futureEvents = pastEvents = false; category = ""; }
+	template <class Archive>
+	void serialize(Archive& ar)
+	{
+		ar(todayEvents, futureEvents, pastEvents, category);
+	}
+};
 
 struct removeCommentStruct
 {
