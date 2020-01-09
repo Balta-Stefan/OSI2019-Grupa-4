@@ -388,7 +388,7 @@ void dodavanjeDogadjaja()
 	}
 
 	std::cout << "kategorija: " << std::endl;
-	std::cin.ignore();
+	//std::cin.ignore();
 	std::getline(std::cin, tempEvent.category);
 	//std::cin >> tempEvent.category;
 	std::cout << std::endl;
@@ -809,7 +809,7 @@ void pregledDogadjaja()
 	{
 		std::cout << "koju kategoriju zelite odabrati? (0 za nijednu)" << std::endl;
 		std::cin >> choice;
-		if ((choice > 0) && (choice <= categories.size()))
+		if ((choice >= 0) && (choice <= categories.size()))
 			break;
 	}
 
