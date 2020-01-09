@@ -376,16 +376,18 @@ void dodavanjeDogadjaja()
 	std::cout << "broj posebnih zahtjeva: ";
 	std::cin >> brojZahtjeva;
 	std::cout << std::endl;
+	std::cin.ignore();
 
 	for (int i = 0; i < brojZahtjeva; i++)
 	{	
 		std::cout << "unesite poseban zahtjev: " << std::endl;
 		std::string temp;
-		std::cin >> temp;
+		
+		std::getline(std::cin, temp);
 		tempEvent.eventData.specialRequirements.push_back(temp);
 	}
 
-	std::cout << "kategorija: ";
+	std::cout << "kategorija: " << std::endl;
 	std::cin.ignore();
 	std::getline(std::cin, tempEvent.category);
 	//std::cin >> tempEvent.category;
