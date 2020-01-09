@@ -1033,7 +1033,7 @@ void send()
 				response << "Niste administrator";
 			}
 			response.close();
-			rename("response2.txt", "response.txt");
+			rename("response2.txt", "removeCommentAnswer.txt");
 		}
 		else if (editQuizRequest.is_open())
 		{

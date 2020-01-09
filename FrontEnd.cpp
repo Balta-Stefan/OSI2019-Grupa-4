@@ -706,7 +706,7 @@ void getEvent(std::string eventName)
 			std::cout << "Unesite redni broj komentara: " << std::endl;
 			std::cin >> toRemove;
 			toRemove--;
-			if ((toRemove >= 0) && (toRemove < tempEvent.userNames.size())) //problem ako nema komentara?
+			if ((toRemove >= 0) && (toRemove < tempEvent.userNames.size()) && (tempEvent.userNames.size() > 0)) //problem ako nema komentara?
 			{
 				//std::string removeComment(std::string commentID, std::string eventName);
 				removeCommentStruct tempStruct;
@@ -853,6 +853,10 @@ void pregledDogadjaja()
 			std::cout << "Kratak opis: " <<events[i].data.shortDescription << std::endl;
 			std::cout << "Lokacija: " << events[i].data.location << std::endl;
 			std::cout << "Kategorija: " << events[i].category << std::endl;
+			std::cout << "Ime: " << events[i].data.eventName << std::endl;
+			std::cout << "Kratak opis: " << std::endl << events[i].data.shortDescription << std::endl;
+			std::cout << "Lokacija: " << events[i].data.location << std::endl;
+			std::cout << "Kategorija: " << events[i].category << std::endl;
 			if (events[i].data.specialRequirements.size() > 0)
 			{
 				std::cout << "Posebni zahtjevi: " << std::endl;
@@ -884,7 +888,7 @@ void pregledDogadjaja()
 			{	
 				std::cout << "odaberite redni broj dogadjaja: " << std::endl;
 				std::cin >> chooseEvent;	
-			} while ((chooseEvent < 1) || (chooseEvent > events.size()));
+			} while ((chooseEvent < 1) || (chooseEvent > events.size()) && (events.size() > 0));
 			
 			std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 			getEvent(events[chooseEvent - 1].data.eventName);
