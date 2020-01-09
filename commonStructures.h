@@ -1,5 +1,19 @@
 #ifndef COMMONSTRUCTURES_H_INCLUDED
 #define COMMONSTRUCTURES_H_INCLUDED
+
+
+
+struct removeCommentStruct
+{
+	std::string sessionID, commentID, eventName;
+
+	template <class Archive>
+	void serialize(Archive& ar)
+	{
+		ar(sessionID, commentID, eventName);
+	}
+};
+
 struct addComment
 {
 	std::string comment, eventName, sessionID;
@@ -111,6 +125,18 @@ struct quiz
 	void serialize(Archive& ar)
 	{
 		ar(questions, answers, rightAnswers);
+	}
+};
+
+
+struct quizEdit
+{
+	quiz data;
+	std::string message;
+	template <class Archive>
+	void serialize(Archive& ar)
+	{
+		ar(data, message);
 	}
 };
 

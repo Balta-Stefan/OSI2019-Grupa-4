@@ -16,12 +16,24 @@
 
 //VAZNA NAPOMENA, ZABRANITI DODAVANJE DOGADJAJA SA ISTIM IMENOM
 
-
+unsigned short MAXQUESTIONS = 10; //max broj pitanja za kviz
+unsigned short MAXANSWERS = 3; //max broj odgovora
 std::string sessionID = "";
 int userRank = 0;
 bool loggedIn = false;
 
 std::string successfulLogOut = "Uspjesno odjavljivanje.";
+
+struct removeCommentStruct
+{
+	std::string sessionID, commentID, eventName;
+
+	template <class Archive>
+	void serialize(Archive& ar)
+	{
+		ar(sessionID, commentID, eventName);
+	}
+};
 
 struct addComment
 {
@@ -137,6 +149,16 @@ struct quiz
 	}
 };
 
+struct quizEdit
+{
+	quiz data;
+	std::string message;
+	template <class Archive>
+	void serialize(Archive& ar)
+	{
+		ar(data, message);
+	}
+};
 
 
 void greska()
@@ -145,6 +167,127 @@ void greska()
 	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 	system("cls");
 }
+
+void izmjenaKviza()
+{
+	std::ofstream request("editQuizRequest2.txt");
+	request << sessionID;
+	request.close();
+	rename("editQuizRequest2.txt", "editQuizRequest.txt");
+
+	while (true)
+	{
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		std::ifstream quizData("editQuizAnswer.bin", std::ios::binary);
+		if (quizData.is_open())
+		{
+			quizEdit tempStruct;
+			cereal::BinaryInputArchive iarchive(quizData);
+			iarchive(tempStruct);
+			quizData.close();
+			remove("editQuizAnswer.bin");
+
+		
+
+			if (tempStruct.message.length() > 0) //greska
+			{
+				std::cout << tempStruct.message << std::endl;
+				std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+				return;
+			}
+			else
+			{
+				while (true)
+				{	
+					system("cls");
+					for (unsigned int i = 0; i < tempStruct.data.questions.size(); i++)
+					{
+						std::cout << i + 1 << ")" << tempStruct.data.questions[i] << std::endl;
+						char tempC = 'a';
+						for (int j = 0; j < MAXANSWERS; j++)
+							std::cout << "	" << tempC++ << ")" << tempStruct.data.answers[i+j] << std::endl;
+						
+						
+						//std::cout << "	b)" << tempStruct.data.answers[i+1]<< std::endl;
+						//std::cout << "	c)" << tempStruct.data.answers[i+2] << std::endl;
+						std::cout << "ispravni odgovor: " << tempStruct.data.answers[tempStruct.data.rightAnswers[i]] << std::endl;
+						std::cout << std::endl;
+					}
+					std::cout << "1)dodaj pitanje" << std::endl;
+					std::cout << "2)izbrisi pitanje" << std::endl;
+					std::cout << "3)izlaz" << std::endl;
+					int choice;
+					std::cin >> choice;
+					std::cout << std::endl;
+					if ((choice == 1) && (tempStruct.data.questions.size() < MAXQUESTIONS))
+					{
+						std::string question;
+						std::vector<std::string>answers;
+						short correctAnswer;
+
+						std::cout << "unesite pitanje:" << std::endl; //mozda potreban cin.ignore()
+						std::getline(std::cin, question);
+
+						for (int i = 0; i < MAXANSWERS; i++)
+						{
+							std::string temp;
+							std::cout << "unesite odgovor " << i + 1 << ":" << std::endl; //mozda potreban cin.ignore()
+							std::getline(std::cin, temp);
+							answers.push_back(temp);
+						}
+
+						std::cout << "odgovori na pitanja su numerisana od 1 do " << MAXANSWERS << std::endl;
+						do
+						{
+							std::cout << "odaberite ispravan odgovor za pitanje " << ":" << std::endl;
+							std::cin >> correctAnswer;
+						} while ((correctAnswer < 1) && (correctAnswer > MAXANSWERS));
+						tempStruct.data.questions.push_back(question);
+						for (auto& i : answers)
+							tempStruct.data.answers.push_back(i);
+						
+					}
+					else if ((choice == 2) && (tempStruct.data.questions.size() > 0)) //brisanje pitanja, mozda neispravno
+					{
+						std::cout << "koje pitanje obrisati? (pitanja su numerisana od 1)" << std::endl;
+						unsigned short toDelete;
+						std::cin >> toDelete;
+				
+
+						if ((toDelete > 0) && (toDelete <= tempStruct.data.questions.size()))
+						{
+							toDelete--;
+
+							tempStruct.data.questions.erase(tempStruct.data.questions.begin() + toDelete);
+							
+							for(int i = 0; i < MAXANSWERS; i++)
+								tempStruct.data.answers.erase(tempStruct.data.answers.begin() + toDelete*MAXANSWERS); //MOZDA NEISPRAVNO
+							tempStruct.data.rightAnswers.erase(tempStruct.data.rightAnswers.begin() + toDelete); //ova linija je problem
+						}
+						else
+							greska();
+					}
+					else if (choice == 3)
+					{
+						std::ofstream changeQuiz("newQuiz2.bin", std::ios::binary);
+						quiz tempQuiz = tempStruct.data;
+						cereal::BinaryOutputArchive oarchive(changeQuiz);
+						oarchive(tempQuiz);
+
+						changeQuiz.close();
+						rename("newQuiz2.bin", "newQuiz.bin");
+						return;
+					}
+					else
+						greska();
+				}
+			}
+		}
+	}
+}
+
+
+
 
 void dodavanjeDogadjaja()
 {
@@ -429,65 +572,77 @@ void igrajKviz()
 
 void pregledDogadjaja()
 {
+	std::ofstream request("showEvents2.txt");
+	request.close();
+	rename("showEvents2.txt", "showEvents.txt");
+
 
 }
 
 void getEvent(std::string eventName)
 {
-	std::ofstream file("getEvent.txt");
-	file << eventName;
-	file.close();
 
-	event tempEvent;
 	while (true)
 	{
-		std::this_thread::sleep_for(std::chrono::milliseconds(200));
-		std::ifstream response("getEventResponse.bin", std::ios::binary);
+		std::ofstream file("getEvent.txt");
+		file << eventName;
+		file.close();
 
-		if (response.is_open())
+		event tempEvent;
+		while (true)
 		{
-			cereal::BinaryInputArchive iarchive(response);
-			iarchive(tempEvent);
-			response.close();
-			std::this_thread::sleep_for(std::chrono::milliseconds(100));
-			remove("getEventResponse.bin");
-			break;
+			std::this_thread::sleep_for(std::chrono::milliseconds(200));
+			std::ifstream response("getEventResponse.bin", std::ios::binary);
+
+			if (response.is_open())
+			{
+				cereal::BinaryInputArchive iarchive(response);
+				iarchive(tempEvent);
+				response.close();
+				std::this_thread::sleep_for(std::chrono::milliseconds(100));
+				remove("getEventResponse.bin");
+				break;
+			}
 		}
-	}
 	
 
 	
+		system("cls");
+		std::cout << "ime dogadjaja: " << tempEvent.data.eventName << std::endl;
+		std::cout << "trajanje dogadjaja: " << 
+			tempEvent.data.startDay << "." << tempEvent.data.startMonth << "." << tempEvent.data.startYear << " " <<
+			tempEvent.data.startHour << ":" << tempEvent.data.startMinute << "-" <<
+			tempEvent.data.endDay << "." << tempEvent.data.endMonth << "." << tempEvent.data.endYear << " " <<
+			tempEvent.data.endHour << ":" << tempEvent.data.endMinute << std::endl;
+		std::cout << "lokacija: " << tempEvent.data.location << std::endl;
+		if (tempEvent.data.specialRequirements.size() > 0)
+		{
+			std::cout << "posebni zahtjevi: " << std::endl;
+			for (auto& i : tempEvent.data.specialRequirements)
+				std::cout << i << std::endl;
+		}
 
-	std::cout << "ime dogadjaja: " << tempEvent.data.eventName << std::endl;
-	std::cout << "trajanje dogadjaja: " << 
-		tempEvent.data.startDay << "." << tempEvent.data.startMonth << "." << tempEvent.data.startYear << " " <<
-		tempEvent.data.startHour << ":" << tempEvent.data.startMinute << "-" <<
-		tempEvent.data.endDay << "." << tempEvent.data.endMonth << "." << tempEvent.data.endYear << " " <<
-		tempEvent.data.endHour << ":" << tempEvent.data.endMinute << std::endl;
-	std::cout << "lokacija: " << tempEvent.data.location << std::endl;
-	if (tempEvent.data.specialRequirements.size() > 0)
-	{
-		std::cout << "posebni zahtjevi: " << std::endl;
-		for (auto& i : tempEvent.data.specialRequirements)
-			std::cout << i << std::endl;
-	}
+		std::cout << "kategorija: " << tempEvent.category << std::endl;
+		std::cout << "opis: " << std::endl;
+		std::cout << tempEvent.description << std::endl;
 
-	std::cout << "kategorija: " << tempEvent.category << std::endl;
-	std::cout << "opis: " << std::endl;
-	std::cout << tempEvent.description << std::endl;
-
-	for (unsigned int i = 0; i < tempEvent.userNames.size(); i++)
-	{
-		std::cout << tempEvent.userNames[i] << std::endl;
-		std::cout << tempEvent.comments[i] << std::endl;
-	}
+		std::cout << "komentari:" << std::endl;
+		for (unsigned int i = 0; i < tempEvent.userNames.size(); i++)
+		{	
+			std::cout << i + 1 << ")";
+			std::cout << tempEvent.userNames[i] << std::endl;
+			std::cout << tempEvent.comments[i] << std::endl;
+		}
 
 	
-
-	while (true)
-	{
+		std::cout << std::endl;
+	
 		std::cout << "1)izlaz" << std::endl;
 		std::cout << "2)dodaj komentar" << std::endl;
+		if (userRank == 1)
+		{
+			std::cout << "3)ukloni komentar" << std::endl;
+		}
 		int answer;
 		std::cin >> answer;
 		std::cout << std::endl;
@@ -534,10 +689,55 @@ void getEvent(std::string eventName)
 				}
 			}
 		}
+		else if ((answer == 3) && (userRank == 1))
+		{
+			unsigned int toRemove;
+			std::cout << std::endl;
+			std::cout << "unesite redni broj komentara: " << std::endl;
+			std::cin >> toRemove;
+			toRemove--;
+			if ((toRemove >= 0) && (toRemove < tempEvent.userNames.size())) //problem ako nema komentara?
+			{
+				//std::string removeComment(std::string commentID, std::string eventName);
+				removeCommentStruct tempStruct;
+				tempStruct.sessionID = sessionID;
+				tempStruct.eventName = eventName;
+				tempStruct.commentID = tempEvent.commentIDs[toRemove];
+
+				std::ofstream request("removeCommentRequest2.bin", std::ios::binary);
+				cereal::BinaryOutputArchive oarchive(request);
+				oarchive(tempStruct);
+
+				request.close();
+				rename("removeCommentRequest2.bin", "removeCommentRequest.bin");
+
+				while (true)
+				{
+					std::this_thread::sleep_for(std::chrono::milliseconds(200));
+					std::ifstream response("removeCommentAnswer.txt");
+					if (response.is_open())
+					{
+						std::string answer;
+						std::getline(response, answer);
+						std::cout << answer << std::endl;
+						response.close();
+						remove("removeCommentAnswer.txt");
+						std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+						break;
+					}
+				}
+
+			}
+			else
+				greska();
+
+			
+		}
 		else
 		{
 			std::cout << "greska" << std::endl;
 		}
+		
 	}
 	
 
@@ -713,7 +913,7 @@ void izmjenaKategorija()
 		if (choice == 1)
 		{
 			unsigned int toRemove;
-			std::cout << "unesite redni broj dogadjaja" << std::endl;
+			std::cout << "unesite redni broj kategorije" << std::endl;
 			std::cin >> toRemove;
 			
 
@@ -723,9 +923,6 @@ void izmjenaKategorija()
 			}
 			else
 				greska();
-			
-				
-
 
 
 		}
@@ -775,6 +972,7 @@ void printMenu()
 	{
 		std::cout << "5)banovanje korisnika" << std::endl;
 		std::cout << "6)izmjena kategorija" << std::endl;
+		std::cout << "7)izmjena kviza" << std::endl;
 	}
 	
 
@@ -830,8 +1028,12 @@ int main()
 				else
 					greska();
 				break;
-				
-					
+			case 7:
+				if (loggedIn && userRank == 1)
+					izmjenaKviza();
+				else
+					greska();
+				break;
 
 			default:
 				greska();

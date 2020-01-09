@@ -12,6 +12,10 @@
 #include "commonStructures.h"
 #include "backEnd.h"
 
+
+unsigned short MAXQUESTIONS = 10;
+unsigned short MAXANSWERS = 3;
+
 static const char alphanum[] =
 "0123456789"
 "!@#$%^&*"
@@ -250,17 +254,20 @@ struct quiz getQuizInfo()
 void editQuiz(struct quiz& newQuiz)
 {
 	int i;
+	int tempVar = newQuiz.questions.size();
+	int tempVar2 = newQuiz.answers.size();
+
 	std::ofstream quizQuestions("kvizPitanja.txt");
-	for (i = 0; i < 10; i++)
+	for (i = 0; i < tempVar; i++)
 		quizQuestions << newQuiz.questions[i] << "-";
-	for (i = 0; i < 30; i++)
-		if (i == 29)
+	for (i = 0; i < tempVar2; i++)
+		if (i == tempVar2 -1)
 			quizQuestions << newQuiz.answers[i] << "\n";
 		else
 			quizQuestions << newQuiz.answers[i] << "-";
 	quizQuestions.close();
 	std::ofstream quizAnswers("kvizOdgovori.txt");
-	for (i = 0; i < 10; i++)
+	for (i = 0; i < tempVar; i++)
 		if (i == 9)
 			quizAnswers << newQuiz.answers[newQuiz.rightAnswers[i]] << "\n";
 		else
@@ -326,7 +333,7 @@ int checkPlayersAnswers(struct quiz& playerQandA)
 {
 	int k = 0, numOfCorrectAnswers = 0;
 	struct quiz quizInfo = getQuizInfo();
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 10; i++)
 	{
 		while (playerQandA.questions[i] != quizInfo.questions[k])
 			k++;
@@ -801,6 +808,10 @@ void send()
 		std::ifstream addCategories("addNewCategories.bin", std::ios::binary);
 		std::ifstream checkEvent("getEvent.txt");
 		std::ifstream addCommentRequest("addCommentRequest.bin", std::ios::binary);
+		std::ifstream showEventsRequest("showEvents.txt");
+		std::ifstream removeCommentRequest("removeCommentRequest.bin", std::ios::binary);
+		std::ifstream editQuizRequest("editQuizRequest.txt");
+		std::ifstream newQuiz("newQuiz.bin", std::ios::binary);
 
 		if (logInFile.is_open())
 		{	
@@ -994,7 +1005,68 @@ void send()
 			giveResponse.close();
 			rename("addCommentResponse2.txt", "addCommentResponse.txt");
 		}
+		else if (showEventsRequest.is_open())
+		{
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			showEventsRequest.close();
+			remove("showEvents.txt");
+		}
+		else if (removeCommentRequest.is_open())
+		{
+			removeCommentStruct tempStruct;
+			cereal::BinaryInputArchive iarchive(removeCommentRequest);
+			iarchive(tempStruct);
+			removeCommentRequest.close();
+			remove("removeCommentRequest.bin");
 
+			std::ofstream response("response2.txt");
+			
+			if (isAdmin(tempStruct.sessionID))
+			{
+				std::string answer = removeComment(tempStruct.commentID, tempStruct.eventName);
+				response << answer;
+			}
+			else
+			{
+				response << "Niste administrator";
+			}
+			response.close();
+			rename("response2.txt", "response.txt");
+		}
+		else if (editQuizRequest.is_open())
+		{
+			std::string temp;
+			editQuizRequest >> temp;
+			editQuizRequest.close();
+			remove("editQuizRequest.txt");
+
+			quizEdit tempStruct;
+			if (isAdmin(temp))
+			{
+				tempStruct.data = getQuizInfo();
+			}
+			else
+			{
+				tempStruct.message = "niste administrator";
+			}
+			std::ofstream response("editQuizAnswer2.bin", std::ios::binary);
+			cereal::BinaryOutputArchive oarchive(response);
+			oarchive(tempStruct);
+
+			response.close();
+			rename("editQuizAnswer2.bin", "editQuizAnswer.bin");
+		}
+		else if (newQuiz.is_open())
+		{
+			quiz tempStruct;
+			cereal::BinaryInputArchive iarchive(newQuiz);
+			iarchive(tempStruct);
+			
+			newQuiz.close();
+			remove("newQuiz.bin");
+
+			editQuiz(tempStruct);
+		}
 		
 	}
 }
