@@ -223,12 +223,12 @@ void izmjenaKviza()
 						for (int j = 0; j < MAXANSWERS; j++)
 							std::cout << "	" << tempC++ << ")" << tempStruct.data.answers[MAXANSWERS*i+j] << std::endl;
 						
-						std::cout << "ispravni odgovor: " << tempStruct.data.answers[tempStruct.data.rightAnswers[i]] << std::endl; //ovo se kvari kada se uklanjaju elementi
+						std::cout << "Ispravni odgovor: " << tempStruct.data.answers[tempStruct.data.rightAnswers[i]] << std::endl; //ovo se kvari kada se uklanjaju elementi
 						std::cout << std::endl;
 					}
-					std::cout << "1)dodaj pitanje" << std::endl;
-					std::cout << "2)izbrisi pitanje" << std::endl;
-					std::cout << "3)izlaz" << std::endl;
+					std::cout << "1)Dodaj pitanje" << std::endl;
+					std::cout << "2)Izbrisi pitanje" << std::endl;
+					std::cout << "3)Izlaz" << std::endl;
 					int choice;
 					std::cin >> choice;
 					std::cout << std::endl;
@@ -238,7 +238,7 @@ void izmjenaKviza()
 						short correctAnswer;
 						int tempSize = tempStruct.data.answers.size() - 1;
 
-						std::cout << "unesite pitanje:" << std::endl; //mozda potreban cin.ignore()
+						std::cout << "Unesite pitanje:" << std::endl; //mozda potreban cin.ignore()
 						std::cin.ignore();
 						std::getline(std::cin, question);
 						tempStruct.data.questions.push_back(question);
@@ -246,15 +246,15 @@ void izmjenaKviza()
 						for (int i = 0; i < MAXANSWERS; i++)
 						{
 							std::string temp;
-							std::cout << "unesite odgovor " << i + 1 << ":" << std::endl; //mozda potreban cin.ignore()
+							std::cout << "Unesite odgovor " << i + 1 << ":" << std::endl; //mozda potreban cin.ignore()
 							std::getline(std::cin, temp);
 							tempStruct.data.answers.push_back(temp);
 						}
 
-						std::cout << "odgovori na pitanja su numerisana od 1 do " << MAXANSWERS << std::endl;
+						std::cout << "Odgovori na pitanja su numerisana od 1 do " << MAXANSWERS << std::endl;
 						do
 						{
-							std::cout << "odaberite ispravan odgovor za pitanje " << ":" << std::endl;
+							std::cout << "Odaberite ispravan odgovor za pitanje " << ":" << std::endl;
 							std::cin >> correctAnswer;
 						} while ((correctAnswer < 1) || (correctAnswer > MAXANSWERS));
 						tempStruct.data.rightAnswers.push_back(tempSize + correctAnswer);
@@ -264,7 +264,7 @@ void izmjenaKviza()
 					}
 					else if ((choice == 2) && (tempStruct.data.questions.size() > 0)) //brisanje pitanja, mozda neispravno
 					{
-						std::cout << "koje pitanje obrisati? (pitanja su numerisana od 1)" << std::endl;
+						std::cout << "Koje pitanje obrisati? (pitanja su numerisana od 1)" << std::endl;
 						unsigned short toDelete;
 						std::cin >> toDelete;
 				
@@ -314,58 +314,58 @@ void dodavanjeDogadjaja()
 	tempEvent.sessionID = sessionID;
 	tempEvent.notDuplicate = false;
 
-	std::cout << "ime dogadjaja: " << std::endl;
+	std::cout << "Ime dogadjaja: " << std::endl;
 	std::cin.ignore();
 	std::getline(std::cin, tempEvent.eventData.eventName);
-	std::cout << "ime je: " << tempEvent.eventData.eventName << std::endl;
+	std::cout << "Ime je: " << tempEvent.eventData.eventName << std::endl;
 	//std::cin >> tempEvent.eventData.eventName;
-	std::cout << "kratak opis:" << std::endl;
+	std::cout << "Kratak opis:" << std::endl;
 	//std::cin.ignore();
 	std::getline(std::cin, tempEvent.eventData.shortDescription);
-	std::cout << "kratki opis je: " << tempEvent.eventData.shortDescription << std::endl;
+	std::cout << "Kratki opis je: " << tempEvent.eventData.shortDescription << std::endl;
 
-	std::cout << "pocetak (sat)" << " ";
+	std::cout << "Pocetak (sat)" << " ";
 	std::cin >> tempEvent.eventData.startHour;
 	std::cout << std::endl;
 
-	std::cout << "pocetak (minuta)" << " ";
+	std::cout << "Pocetak (minuta)" << " ";
 	std::cin >> tempEvent.eventData.startMinute;
 	std::cout << std::endl;
 
-	std::cout << "pocetak (mjesec)" << " ";
+	std::cout << "Pocetak (mjesec)" << " ";
 	std::cin >> tempEvent.eventData.startMonth;
 	std::cout << std::endl;
 
-	std::cout << "pocetak (dan)" << " ";
+	std::cout << "Pocetak (dan)" << " ";
 	std::cin >> tempEvent.eventData.startDay;
 	std::cout << std::endl;
 
-	std::cout << "pocetak (godina)" << " ";
+	std::cout << "Pocetak (godina)" << " ";
 	std::cin >> tempEvent.eventData.startYear;
 	std::cout << std::endl;
 
-	std::cout << "kraj (sat)" << " ";
+	std::cout << "Kraj (sat)" << " ";
 	std::cin >> tempEvent.eventData.endHour;
 	std::cout << std::endl;
 
-	std::cout << "kraj (minuta)" << " ";
+	std::cout << "Kraj (minuta)" << " ";
 	std::cin >> tempEvent.eventData.endMinute;
 	std::cout << std::endl;
 
-	std::cout << "kraj (mjesec)" << " ";
+	std::cout << "Kraj (mjesec)" << " ";
 	std::cin >> tempEvent.eventData.endMonth;
 	std::cout << std::endl;
 
-	std::cout << "kraj (dan)" << " ";
+	std::cout << "Kraj (dan)" << " ";
 	std::cin >> tempEvent.eventData.endDay;
 	std::cout << std::endl;
 
-	std::cout << "kraj (godina)" << " ";
+	std::cout << "Kraj (godina)" << " ";
 	std::cin >> tempEvent.eventData.endYear;
 	std::cout << std::endl;
 
 
-	std::cout << "lokacija: ";
+	std::cout << "Lokacija: ";
 	std::cin.ignore();
 	std::getline(std::cin, tempEvent.eventData.location);
 	//std::cin >> tempEvent.eventData.location;
@@ -373,28 +373,28 @@ void dodavanjeDogadjaja()
 
 	int brojZahtjeva;
 
-	std::cout << "broj posebnih zahtjeva: ";
+	std::cout << "Broj posebnih zahtjeva: ";
 	std::cin >> brojZahtjeva;
 	std::cout << std::endl;
 	std::cin.ignore();
 
 	for (int i = 0; i < brojZahtjeva; i++)
 	{	
-		std::cout << "unesite poseban zahtjev: " << std::endl;
+		std::cout << "Unesite poseban zahtjev: " << std::endl;
 		std::string temp;
 		
 		std::getline(std::cin, temp);
 		tempEvent.eventData.specialRequirements.push_back(temp);
 	}
 
-	std::cout << "kategorija: " << std::endl;
+	std::cout << "Kategorija: " << std::endl;
 	//std::cin.ignore();
 	std::getline(std::cin, tempEvent.category);
 	//std::cin >> tempEvent.category;
 	std::cout << std::endl;
 
 	
-	std::cout << "unesite opis dogadjaja: " << std::endl;
+	std::cout << "Unesite opis dogadjaja: " << std::endl;
 	//std::cin.ignore();
 	std::getline(std::cin, tempEvent.description);
 
@@ -438,11 +438,11 @@ void logIn()
 	char tempChar;
 	const char ENTER = 13;
 
-	std::cout << "unesite korisnicko ime: " << std::endl;
+	std::cout << "Unesite korisnicko ime: " << std::endl;
 	std::cin.ignore();
 	std::getline(std::cin, userName);
 	std::cout << std::endl;
-	std::cout << "unesite lozinku: " << std::endl;
+	std::cout << "Unesite lozinku: " << std::endl;
 
 
 
@@ -575,7 +575,7 @@ void igrajKviz()
 		{
 			int valid;
 			validAnswers >> valid;
-			std::cout << "broj ispravnih odgovora: " << valid << std::endl;
+			std::cout << "Broj ispravnih odgovora: " << valid << std::endl;
 			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 			validAnswers.close();
 			remove("correctAnswers.txt");
@@ -618,25 +618,25 @@ void getEvent(std::string eventName)
 
 
 		system("cls");
-		std::cout << "ime dogadjaja: " << tempEvent.data.eventName << std::endl;
-		std::cout << "trajanje dogadjaja: " <<
+		std::cout << "Ime dogadjaja: " << tempEvent.data.eventName << std::endl;
+		std::cout << "Trajanje dogadjaja: " <<
 			tempEvent.data.startDay << "." << tempEvent.data.startMonth << "." << tempEvent.data.startYear << " " <<
 			tempEvent.data.startHour << ":" << tempEvent.data.startMinute << "-" <<
 			tempEvent.data.endDay << "." << tempEvent.data.endMonth << "." << tempEvent.data.endYear << " " <<
 			tempEvent.data.endHour << ":" << tempEvent.data.endMinute << std::endl;
-		std::cout << "lokacija: " << tempEvent.data.location << std::endl;
+		std::cout << "Lokacija: " << tempEvent.data.location << std::endl;
 		if (tempEvent.data.specialRequirements.size() > 0)
 		{
-			std::cout << "posebni zahtjevi: " << std::endl;
+			std::cout << "Posebni zahtjevi: " << std::endl;
 			for (auto& i : tempEvent.data.specialRequirements)
-				std::cout << i << std::endl;
+				std::cout <<"	-"<< i << std::endl;
 		}
 
-		std::cout << "kategorija: " << tempEvent.category << std::endl;
-		std::cout << "opis: " << std::endl;
+		std::cout << "Kategorija: " << tempEvent.category << std::endl;
+		std::cout << "Opis: " << std::endl;
 		std::cout << tempEvent.description << std::endl;
 
-		std::cout << "komentari:" << std::endl;
+		std::cout << "Komentari:" << std::endl;
 		for (unsigned int i = 0; i < tempEvent.userNames.size(); i++)
 		{
 			std::cout << i + 1 << ")";
@@ -647,11 +647,11 @@ void getEvent(std::string eventName)
 
 		std::cout << std::endl;
 
-		std::cout << "1)izlaz" << std::endl;
-		std::cout << "2)dodaj komentar" << std::endl;
+		std::cout << "1)Izlaz" << std::endl;
+		std::cout << "2)Dodaj komentar" << std::endl;
 		if (userRank == 1)
 		{
-			std::cout << "3)ukloni komentar" << std::endl;
+			std::cout << "3)Ukloni komentar" << std::endl;
 		}
 		int answer;
 		std::cin >> answer;
@@ -665,11 +665,11 @@ void getEvent(std::string eventName)
 		{
 			addComment komentar;
 			//std::string eventComment(std::string comment, std::string eventName, std::string sessionID);
-			std::cout << "unesite komentar:" << std::endl;
+			std::cout << "Unesite komentar:" << std::endl;
 			std::cin.ignore();
 			getline(std::cin, komentar.comment);
 			if (komentar.comment.length() > 400)
-				std::cout << "komentar ne smije biti duži od 400 znakova" << std::endl;
+				std::cout << "Komentar ne smije biti duži od 400 znakova" << std::endl;
 			else
 			{
 				komentar.eventName = eventName;
@@ -703,7 +703,7 @@ void getEvent(std::string eventName)
 		{
 			unsigned int toRemove;
 			std::cout << std::endl;
-			std::cout << "unesite redni broj komentara: " << std::endl;
+			std::cout << "Unesite redni broj komentara: " << std::endl;
 			std::cin >> toRemove;
 			toRemove--;
 			if ((toRemove >= 0) && (toRemove < tempEvent.userNames.size())) //problem ako nema komentara?
@@ -761,19 +761,18 @@ void pregledDogadjaja()
 	system("cls");
 	eventsFilter tempStruct;
 	short tempChar;
-
-	std::cout << "pregledati prosle dogadjaje (0/1)?" << std::endl;
+	std::cout << "Pregledati prosle dogadjaje (0/1)?" << std::endl;
 	std::cin >> tempChar;
 	if (tempChar == 1)
 		tempStruct.pastEvents = true;
 
-	std::cout << "pregledati danasnje dogadjaje (0/1)?" << std::endl;
+	std::cout << "Pregledati danasnje dogadjaje (0/1)?" << std::endl;
 	std::cin >> tempChar;
 	if (tempChar == 1)
 		tempStruct.todayEvents = true;
 
 
-	std::cout << "pregledati buduce dogadjaje (0/1)?" << std::endl;
+	std::cout << "Pregledati buduce dogadjaje (0/1)?" << std::endl;
 	std::cin >> tempChar;
 	if (tempChar == 1)
 		tempStruct.futureEvents = true;
@@ -799,7 +798,7 @@ void pregledDogadjaja()
 		}
 	}
 
-	std::cout << "kategorije: " << std::endl;
+	std::cout << "Kategorije: " << std::endl;
 	for (unsigned int i = 0; i < categories.size(); i++)
 		std::cout << i + 1 << ")" << categories[i] << std::endl;
 
@@ -807,7 +806,7 @@ void pregledDogadjaja()
 	unsigned short choice;
 	while ((categories.size() > 0))
 	{
-		std::cout << "koju kategoriju zelite odabrati? (0 za nijednu)" << std::endl;
+		std::cout << "Koju kategoriju zelite odabrati? (0 za nijednu)" << std::endl;
 		std::cin >> choice;
 		if ((choice >= 0) && (choice <= categories.size()))
 			break;
@@ -850,23 +849,23 @@ void pregledDogadjaja()
 		for (unsigned int i = 0; i < events.size(); i++)
 		{
 			std::cout << i + 1 << std::endl;
-			std::cout << "ime: " << std::endl << events[i].data.eventName << std::endl;
-			std::cout << "kratak opis: " << std::endl << events[i].data.shortDescription << std::endl;
-			std::cout << "lokacija: " << events[i].data.location << std::endl;
-			std::cout << "kategorija: " << events[i].category << std::endl;
+			std::cout << "Ime: "  << events[i].data.eventName << std::endl;
+			std::cout << "Kratak opis: " <<events[i].data.shortDescription << std::endl;
+			std::cout << "Lokacija: " << events[i].data.location << std::endl;
+			std::cout << "Kategorija: " << events[i].category << std::endl;
 			if (events[i].data.specialRequirements.size() > 0)
 			{
-				std::cout << "posebni zahtjevi: " << std::endl;
+				std::cout << "Posebni zahtjevi: " << std::endl;
 
 				for (unsigned int j = 0; j < events[i].data.specialRequirements.size() - 1; j++)
-					std::cout << events[i].data.specialRequirements[j] << ", ";
-				std::cout << events[i].data.specialRequirements.back() << std::endl;
+					std::cout <<"	-"<< events[i].data.specialRequirements[j] << std::endl;
+				std::cout << "	-"<<events[i].data.specialRequirements.back() << std::endl;
 			}
 			
 		}
 
-		std::cout << "1)nazad" << std::endl;
-		std::cout << "2)odaberi dogadjaj" << std::endl;
+		std::cout << "1)Nazad" << std::endl;
+		std::cout << "2)Odaberi dogadjaj" << std::endl;
 		std::cout << std::endl;
 
 		
@@ -935,8 +934,8 @@ void pregledVlastitihDogadaja()
 
 		std::cout << std::endl;
 		int response;
-		std::cout << "1)pregledaj dogadjaj" << std::endl;
-		std::cout << "2)izlaz" << std::endl;
+		std::cout << "1)Pregledaj dogadjaj" << std::endl;
+		std::cout << "2)Izlaz" << std::endl;
 		std::cin >> response;
 
 		if (response == 1)
@@ -969,7 +968,7 @@ void banovanjeKorisnika()
 	banUserStruct tempStruct;
 	tempStruct.sessionID = sessionID;
 
-	std::cout << "unesite ime korisnika za banovanje:" << std::endl;
+	std::cout << "Unesite ime korisnika za banovanje:" << std::endl;
 	std::cin.ignore();
 	std::getline(std::cin, tempStruct.user2Ban);
 	
@@ -1055,16 +1054,16 @@ void izmjenaKategorija()
 				std::cout << counter++ << ")" << category << std::endl;
 		
 		std::cout << std::endl;
-		std::cout << "1)obrisi" << std::endl;
-		std::cout << "2)dodaj" << std::endl;
-		std::cout << "3)izlaz" << std::endl;
+		std::cout << "1)Obrisi" << std::endl;
+		std::cout << "2)Dodaj" << std::endl;
+		std::cout << "3)Izlaz" << std::endl;
 		std::cin >> choice;
 	
 
 		if (choice == 1)
 		{
 			unsigned int toRemove;
-			std::cout << "unesite redni broj kategorije" << std::endl;
+			std::cout << "Unesite redni broj kategorije" << std::endl;
 			std::cin >> toRemove;
 			
 
@@ -1080,7 +1079,7 @@ void izmjenaKategorija()
 		else if (choice == 2)
 		{
 			std::string newCategory;
-			std::cout << "unesite ime nove kategorije:" << std::endl;
+			std::cout << "Unesite ime nove kategorije:" << std::endl;
 			std::cin.ignore();
 			std::getline(std::cin, newCategory);
 			categories.push_back(newCategory);
@@ -1107,23 +1106,23 @@ void izmjenaKategorija()
 void printMenu()
 {
 	system("cls");
-	std::cout << "0)izlaz" << std::endl;
-	std::cout << "1)pregled dogadjaja" << std::endl;
-	std::cout << "2)igranje kviza" << std::endl;
+	std::cout << "0)Izlaz" << std::endl;
+	std::cout << "1)Pregled dogadjaja" << std::endl;
+	std::cout << "2)Igranje kviza" << std::endl;
 
 	if (loggedIn)
 	{
-		std::cout << "3)dodavanje dogadjaja" << std::endl;
-		std::cout << "4)pregled vlastitih dogadjaja" << std::endl;
+		std::cout << "3)Dodavanje dogadjaja" << std::endl;
+		std::cout << "4)Pregled vlastitih dogadjaja" << std::endl;
 	}
 	else
-		std::cout << "3)prijava" << std::endl;
+		std::cout << "3)Prijava" << std::endl;
 
 	if (userRank == 1)
 	{
-		std::cout << "5)banovanje korisnika" << std::endl;
-		std::cout << "6)izmjena kategorija" << std::endl;
-		std::cout << "7)izmjena kviza" << std::endl;
+		std::cout << "5)Banovanje korisnika" << std::endl;
+		std::cout << "6)Izmjena kategorija" << std::endl;
+		std::cout << "7)Izmjena kviza" << std::endl;
 	}
 	
 

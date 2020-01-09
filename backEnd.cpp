@@ -296,10 +296,10 @@ std::vector<std::string> getCategories()
 }
 
 void changeCategories(std::vector<std::string> newCategories)
-{	
+{
 	unsigned int i, j, flag = 0;
 	for (i = 0; i < newCategories.size(); i++)
-	{	
+	{
 		for (j = 0; j < newCategories.size(); j++)
 			if (newCategories[i] == newCategories[j])
 			{
@@ -311,13 +311,9 @@ void changeCategories(std::vector<std::string> newCategories)
 
 	}
 	std::ofstream categories("kategorije.txt");
-	if (newCategories.size() > 0)
-	{
-		for (i = 0; i < newCategories.size() - 1; i++)
-			categories << newCategories[i] << "-";
-		categories << newCategories[i];
-	}
-
+	for (i = 0; i < newCategories.size() - 1; i++)
+		categories << newCategories[i] << "-";
+	categories << newCategories[i];
 }
 
 struct quiz4Players getQuestions4Player()
@@ -325,10 +321,10 @@ struct quiz4Players getQuestions4Player()
 	struct quiz quizInfo;
 	struct quiz4Players quizForPlayers;
 	quizInfo = getQuizInfo();
-	unsigned int i;
-	for (i = 0; i < quizForPlayers.questions.size(); i++)
+	int i;
+	for (i = 0; i < 10; i++)
 		quizForPlayers.questions.push_back(quizInfo.questions[i]);
-	for (i = 0; i < quizForPlayers.answers.size(); i++)
+	for (i = 0; i < 30; i++)
 		quizForPlayers.answers.push_back(quizInfo.answers[i]);
 	return quizForPlayers;
 }
@@ -955,10 +951,14 @@ void send()
 			addCategories.close();
 			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			remove("addNewCategories.bin");
+			//debug
+			for (auto& i : categories)
+				std::cout << i << std::endl;
 			
+			std::cout << std::endl;//debug
 
 			userSessionID = categories[0];
-			
+			std::cout << "session id is: " << userSessionID << std::endl;
 			temp = categories.back();
 			categories.back() = categories[0];
 			categories[0] = temp;
