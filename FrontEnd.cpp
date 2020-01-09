@@ -760,7 +760,7 @@ void pregledDogadjaja()
 	
 	system("cls");
 	eventsFilter tempStruct;
-	char tempChar;
+	short tempChar;
 
 	std::cout << "pregledati prosle dogadjaje (0/1)?" << std::endl;
 	std::cin >> tempChar;
