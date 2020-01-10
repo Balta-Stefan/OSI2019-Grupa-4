@@ -1101,6 +1101,21 @@ void pregledDogadjaja()
 			std::cout << "Kategorija: " << events[i].category << "|" << std::endl;
 			std::cout << std::string(categoryLen, '-') << "+" << std::endl;
 
+			std::cout << std::string(5, '-') << "+" << std::endl;
+			std::cout << "Trajanje: ";
+			std::cout << events[i].data.startDay << "." << events[i].data.startMonth << "." << events[i].data.startYear << ". (";
+			std::cout << events[i].data.startHour << ":";
+			if (events[i].data.startMinute < 10)
+				std::cout << "0";
+			std::cout << events[i].data.startMinute << ") - ";
+			std::cout << events[i].data.endDay << "." << events[i].data.endMonth << "." << events[i].data.endYear << ". (";
+			std::cout << events[i].data.endHour << ":";
+			if (events[i].data.endMinute < 10)
+				std::cout << "0";
+			std::cout << events[i].data.endMinute << ")" << std::endl;
+
+			std::cout << std::string(5, '-') << "+" << std::endl;
+
 			if (events[i].data.specialRequirements.size() > 0)
 			{
 				std::cout << std::string(18, '-') << "+" << std::endl;
