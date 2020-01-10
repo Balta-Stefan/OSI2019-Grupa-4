@@ -867,12 +867,101 @@ void getEvent(std::string eventName)
 
 }
 
+void insertionSort(std::vector<event>& events, int n)
+{
+	int i, key, j;
+	for (i = 1; i < n; i++)
+	{
+		key = events[i].data.startYear;
+		j = i - 1;
+
+		/* Move elements of arr[0..i-1], that are
+		greater than key, to one position ahead
+		of their current position */
+		while (j >= 0 && events[j].data.startYear > key)
+		{
+			events[j + 1] = events[j];
+			j = j - 1;
+		}
+		events[j + 1].data.startYear = key;
+	}
+
+
+	
+	for (i = 1; i < n; i++)
+	{
+		key = events[i].data.startMonth;
+		j = i - 1;
+
+		/* Move elements of arr[0..i-1], that are
+		greater than key, to one position ahead
+		of their current position */
+		while (j >= 0 && events[j].data.startMonth > key)
+		{
+			events[j + 1] = events[j];
+			j = j - 1;
+		}
+		events[j + 1].data.startMonth = key;
+	}
+
+	for (i = 1; i < n; i++)
+	{
+		key = events[i].data.startDay;
+		j = i - 1;
+
+		/* Move elements of arr[0..i-1], that are
+		greater than key, to one position ahead
+		of their current position */
+		while (j >= 0 && events[j].data.startDay > key)
+		{
+			events[j + 1] = events[j];
+			j = j - 1;
+		}
+		events[j + 1].data.startDay = key;
+	}
+
+	for (i = 1; i < n; i++)
+	{
+		key = events[i].data.startHour;
+		j = i - 1;
+
+		/* Move elements of arr[0..i-1], that are
+		greater than key, to one position ahead
+		of their current position */
+		while (j >= 0 && events[j].data.startHour > key)
+		{
+			events[j + 1] = events[j];
+			j = j - 1;
+		}
+		events[j + 1].data.startHour = key;
+	}
+
+	for (i = 1; i < n; i++)
+	{
+		key = events[i].data.startMinute;
+		j = i - 1;
+
+		/* Move elements of arr[0..i-1], that are
+		greater than key, to one position ahead
+		of their current position */
+		while (j >= 0 && events[j].data.startMinute > key)
+		{
+			events[j + 1] = events[j];
+			j = j - 1;
+		}
+		events[j + 1].data.startMinute = key;
+	}
+}
+
 void pregledDogadjaja()
 {
 
 	system("cls");
 	eventsFilter tempStruct;
 	char tempChar;
+
+
+	bool sortByDate = false;
 
 	std::cout << "Pregledati prosle dogadjaje (d/n)?" << std::endl;
 	std::cin >> tempChar;
@@ -889,6 +978,11 @@ void pregledDogadjaja()
 	std::cin >> tempChar;
 	if (tempChar == 'd')
 		tempStruct.futureEvents = true;
+
+	std::cout << "Sortirati dogadjaje po datumu i vremenu (rastuci)? (d/n)" << std::endl;
+	std:: cin >> tempChar;
+	if (tempChar == 'd')
+		sortByDate = true;
 
 	std::ofstream getCategories("changeCategoriesRequest2.txt");
 	getCategories.close();
@@ -936,8 +1030,12 @@ void pregledDogadjaja()
 	request.close();
 	rename("checkEvents2.bin", "checkEvents.bin");
 
-
+	
 	std::vector<event> events;
+	//call insertion sort here
+	if(sortByDate == true)
+		insertionSort(events, events.size());
+
 	while (true)
 	{
 		std::this_thread::sleep_for(std::chrono::milliseconds(200));
