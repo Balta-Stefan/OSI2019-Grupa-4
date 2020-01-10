@@ -11,3 +11,4 @@
 5)kvizPitanja.txt: pitanje1-pitanje2-...-pitanje10-odgovor11-odgovor12-odgovor13-...-odgovor102-odgovor103
 6)kvizOdgovori.txt: odgovor1-odgovor2-...-odgovor10 
 7)kategorije.txt - kategorija1-kategorija2-...
+8)informacije.txt - sadrži informacije o aplikaciji, popunjava se ručno (koristeći neki program za čitanje txt fajlova)
