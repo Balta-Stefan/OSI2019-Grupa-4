@@ -122,6 +122,11 @@ struct loginConfirmation
 	}
 };
 
+struct deleteEvent
+{
+	std::string sessionID, eventName;
+};
+
 
 
 
