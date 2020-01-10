@@ -14,6 +14,7 @@
 #include <cereal/types/string.hpp>
 #include <cereal/types/vector.hpp>
 #include <iomanip>
+#include <algorithm>
 
 //VAZNA NAPOMENA, ZABRANITI DODAVANJE DOGADJAJA SA ISTIM IMENOM
 
@@ -175,6 +176,17 @@ struct quizEdit
 		ar(data, message);
 	}
 };
+
+
+int countDigit(size_t n)
+{
+	int count = 0;
+	while (n != 0) {
+		n = n / 10;
+		++count;
+	}
+	return count;
+}
 
 
 void greska()
@@ -515,7 +527,7 @@ void logIn()
 void igrajKviz()
 {
 	//backend gives answer via quiz.txt, format is: num of lines \n all questions then all answers (each entry is in new line)
-
+	system("cls");
 	std::ofstream request("quizRequest2.txt");
 	request.close();
 	rename("quizRequest2.txt", "quizRequest.txt");
@@ -543,16 +555,24 @@ void igrajKviz()
 	quiz tempKviz;
 	tempKviz.questions = kviz.questions;
 
-	for (int i = 0; i < 10; i++)
-	{
-		std::cout << "Pitanje " << i + 1 << ": " << kviz.questions[i] << std::endl;
+	for (int i = 0; i < MAXQUESTIONS; i++)
+	{	
+		size_t questionLength = kviz.questions[i].length();
+		std::cout << "Pitanje " << i + 1 << ": " << std::endl;
+		std::cout << std::string(questionLength, '-') << std::endl;
+		
+		std::cout << kviz.questions[i] << std::endl;
+		std::cout << std::string(questionLength, '-') << std::endl;
 		std::cout << "1)" << kviz.answers[i * 3] << std::endl;
 		std::cout << "2)" << kviz.answers[i * 3 + 1] << std::endl;
 		std::cout << "3)" << kviz.answers[i * 3 + 2] << std::endl;
 
 		short answer;
+		std::cout << std::endl;
+		std::cout << "Unesite odgovor: ";
 		std::cin >> answer;
 		tempKviz.answers.push_back(kviz.answers[(answer - 1) + i * 3]);
+		system("cls");
 	}
 
 
@@ -577,14 +597,17 @@ void igrajKviz()
 			int valid;
 			validAnswers >> valid;
 			std::cout << "Broj ispravnih odgovora: " << valid << std::endl;
-			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 			validAnswers.close();
 			remove("correctAnswers.txt");
-			return;
+			break;
 		}
 	}
 
 
+	std::string temp;
+	std::cout << "Unesite bilo koju vrijednost za izlaz: ";
+	std::cin >> temp;
+	
 
 
 
@@ -761,22 +784,22 @@ void pregledDogadjaja()
 
 	system("cls");
 	eventsFilter tempStruct;
-	short tempChar;
+	char tempChar;
 
-	std::cout << "Pregledati prosle dogadjaje (0/1)?" << std::endl;
+	std::cout << "Pregledati prosle dogadjaje (d/n)?" << std::endl;
 	std::cin >> tempChar;
-	if (tempChar == 1)
+	if (tempChar == 'd')
 		tempStruct.pastEvents = true;
 
-	std::cout << "Pregledati danasnje dogadjaje (0/1)?" << std::endl;
+	std::cout << "Pregledati danasnje dogadjaje (d/n)?" << std::endl;
 	std::cin >> tempChar;
-	if (tempChar == 1)
+	if (tempChar == 'd')
 		tempStruct.todayEvents = true;
 
 
-	std::cout << "Pregledati buduce dogadjaje (0/1)?" << std::endl;
+	std::cout << "Pregledati buduce dogadjaje (d/n)?" << std::endl;
 	std::cin >> tempChar;
-	if (tempChar == 1)
+	if (tempChar == 'd')
 		tempStruct.futureEvents = true;
 
 	std::ofstream getCategories("changeCategoriesRequest2.txt");
@@ -847,25 +870,68 @@ void pregledDogadjaja()
 	{
 		system("cls");
 
-
+		std::cout << std::string(30, '=') << std::endl;
 		for (unsigned int i = 0; i < events.size(); i++)
-		{
-			std::cout << i + 1 << std::endl;
-			std::cout << "Ime: " << events[i].data.eventName << std::endl;
-			std::cout << "Kratak opis: " << std::endl << events[i].data.shortDescription << std::endl;
-			std::cout << "Lokacija: " << events[i].data.location << std::endl;
-			std::cout << "Kategorija: " << events[i].category << std::endl;
+		{	
+			//dodati brojevi na size_t var-ove su pomjeraji zbog hardkodiranih stringova
+			size_t nameLen = events[i].data.eventName.length() + 5;
+			size_t shortDescriptionLen = events[i].data.shortDescription.length();
+			size_t locationLen = events[i].data.location.length() + 10;
+			size_t categoryLen = events[i].category.length() + 12;
+
+			events[i].data.shortDescription.erase(std::remove(events[i].data.shortDescription.begin(), events[i].data.shortDescription.end(), '\n'),
+				events[i].data.shortDescription.end());
+			
+			
+			//std::cout << "***" << i + 1 << "." << "***" << std::endl;
+			int numOfDigits = countDigit(i);
+			int numOfUnderscores = nameLen / 2;
+			if ((nameLen % 2) == 0)
+				numOfUnderscores--;
+			if (numOfDigits > 1)
+				numOfUnderscores -= numOfDigits;
+
+			std::cout << std::string(nameLen / 2, '_') << i + 1 << "." << std::string(numOfUnderscores, '_') << std::endl;
+
+			std::cout << std::string(nameLen, '-') << "+" << std::endl;
+			std::cout << "Ime: " << events[i].data.eventName << "|" << std::endl;
+			std::cout << std::string(nameLen, '-') << "+" << std::endl;
+
+			std::cout << "Kratak opis: " << std::endl;
+			std::cout << std::string(shortDescriptionLen, '-') << "+" << std::endl;
+			std::cout << events[i].data.shortDescription << " |" << std::endl;
+			std::cout << std::string(shortDescriptionLen, '-') << "+" << std::endl;
+
+			std::cout << std::string(locationLen, '-') << "+" << std::endl;
+			std::cout << "Lokacija: " << events[i].data.location << "|" << std::endl;
+			std::cout << std::string(locationLen, '-') << "+" << std::endl;
+
+
+			std::cout << std::string(categoryLen, '-') << "+" << std::endl;
+			std::cout << "Kategorija: " << events[i].category << "|" << std::endl;
+			std::cout << std::string(categoryLen, '-') << "+";
+
 			if (events[i].data.specialRequirements.size() > 0)
 			{
-				std::cout << "Posebni zahtjevi: " << std::endl;
+				std::cout << std::string(18, '-') << "+" << std::endl;
+				std::cout << "Posebni zahtjevi: |" << std::endl;
+				std::cout << std::string(18, '-') << "+" << std::endl;
 
 				for (unsigned int j = 0; j < events[i].data.specialRequirements.size() - 1; j++)
 					std::cout << events[i].data.specialRequirements[j] << ", ";
 				std::cout << events[i].data.specialRequirements.back() << std::endl;
 			}
+			std::cout << std::endl << std::endl;
+			std::cout << std::string(16, '-') << "+" << std::endl;
+			std::cout << "Opis dogadjaja: |" << std::endl;
+			std::cout << std::string(16, '-') << "+" << std::endl;
+
+			std::cout << events[i].description;
+			std::cout << std::string(30, '=') << std::endl;
 
 		}
 
+		std::cout << std::endl << std::endl;
 		std::cout << "1)Nazad" << std::endl;
 		std::cout << "2)Odaberi dogadjaj" << std::endl;
 		std::cout << std::endl;
