@@ -879,80 +879,44 @@ void insertionSort(std::vector<event>& events, int n)
 		j = i - 1;
 
 		
-		while (j >= 0 && events[j].data.startYear > key)
-		{
-			events[j + 1] = events[j];
-			j = j - 1;
+		while (j >= 0 && events[j].data.startYear >= key)
+		{	
+			if (events[j].data.startYear == key)
+			{
+				if (events[j].data.startMonth > tempEvent.data.startMonth)
+				{
+					events[j + 1] = events[j];
+					j = j - 1;
+				}
+				else if (events[j].data.startDay > tempEvent.data.startDay)
+				{
+					events[j + 1] = events[j];
+					j = j - 1;
+				}
+				else if (events[j].data.startHour > tempEvent.data.startHour)
+				{
+					events[j + 1] = events[j];
+					j = j - 1;
+				}
+				else if (events[j].data.startMinute > tempEvent.data.startMinute)
+				{
+					events[j + 1] = events[j];
+					j = j - 1;
+				}
+				else
+					break;
+			}
+			else
+			{
+				events[j + 1] = events[j];
+				j = j - 1;
+			}
+			
 		}
 		//events[j + 1].data.startYear = key;
 		events[j + 1] = tempEvent;
 	}
 
-
-	
-	for (i = 1; i < n; i++)
-	{
-		key = events[i].data.startMonth;
-		tempEvent = events[i];
-		j = i - 1;
-
-		while (j >= 0 && events[j].data.startMonth > key)
-		{
-			events[j + 1] = events[j];
-			j = j - 1;
-		}
-		//events[j + 1].data.startMonth = key;
-		events[j + 1] = tempEvent;
-	}
-
-	for (i = 1; i < n; i++)
-	{
-		key = events[i].data.startDay;
-		tempEvent = events[i];
-		j = i - 1;
-
-		
-		while (j >= 0 && events[j].data.startDay > key)
-		{
-			events[j + 1] = events[j];
-			j = j - 1;
-		}
-		//events[j + 1].data.startDay = key;
-		events[j + 1] = tempEvent;
-	}
-
-	for (i = 1; i < n; i++)
-	{
-		key = events[i].data.startHour;
-		tempEvent = events[i];
-		j = i - 1;
-
-		
-		while (j >= 0 && events[j].data.startHour > key)
-		{
-			events[j + 1] = events[j];
-			j = j - 1;
-		}
-		//events[j + 1].data.startHour = key;
-		events[j + 1] = tempEvent;
-
-	}
-
-	for (i = 1; i < n; i++)
-	{
-		key = events[i].data.startMinute;
-		tempEvent = events[i];
-		j = i - 1;
-
-		
-		while (j >= 0 && events[j].data.startMinute > key)
-		{
-			events[j + 1] = events[j];
-			j = j - 1;
-		}
-		//events[j + 1].data.startMinute = key;
-		events[j + 1] = tempEvent;
-	}
 }
 
 void pregledDogadjaja()
