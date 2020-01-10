@@ -870,20 +870,22 @@ void getEvent(std::string eventName)
 void insertionSort(std::vector<event>& events, int n)
 {
 	int i, key, j;
+	event tempEvent;
+
 	for (i = 1; i < n; i++)
 	{
 		key = events[i].data.startYear;
+		tempEvent = events[i];
 		j = i - 1;
 
-		/* Move elements of arr[0..i-1], that are
-		greater than key, to one position ahead
-		of their current position */
+		
 		while (j >= 0 && events[j].data.startYear > key)
 		{
 			events[j + 1] = events[j];
 			j = j - 1;
 		}
-		events[j + 1].data.startYear = key;
+		//events[j + 1].data.startYear = key;
+		events[j + 1] = tempEvent;
 	}
 
 
@@ -891,65 +893,65 @@ void insertionSort(std::vector<event>& events, int n)
 	for (i = 1; i < n; i++)
 	{
 		key = events[i].data.startMonth;
+		tempEvent = events[i];
 		j = i - 1;
 
-		/* Move elements of arr[0..i-1], that are
-		greater than key, to one position ahead
-		of their current position */
 		while (j >= 0 && events[j].data.startMonth > key)
 		{
 			events[j + 1] = events[j];
 			j = j - 1;
 		}
-		events[j + 1].data.startMonth = key;
+		//events[j + 1].data.startMonth = key;
+		events[j + 1] = tempEvent;
 	}
 
 	for (i = 1; i < n; i++)
 	{
 		key = events[i].data.startDay;
+		tempEvent = events[i];
 		j = i - 1;
 
-		/* Move elements of arr[0..i-1], that are
-		greater than key, to one position ahead
-		of their current position */
+		
 		while (j >= 0 && events[j].data.startDay > key)
 		{
 			events[j + 1] = events[j];
 			j = j - 1;
 		}
-		events[j + 1].data.startDay = key;
+		//events[j + 1].data.startDay = key;
+		events[j + 1] = tempEvent;
 	}
 
 	for (i = 1; i < n; i++)
 	{
 		key = events[i].data.startHour;
+		tempEvent = events[i];
 		j = i - 1;
 
-		/* Move elements of arr[0..i-1], that are
-		greater than key, to one position ahead
-		of their current position */
+		
 		while (j >= 0 && events[j].data.startHour > key)
 		{
 			events[j + 1] = events[j];
 			j = j - 1;
 		}
-		events[j + 1].data.startHour = key;
+		//events[j + 1].data.startHour = key;
+		events[j + 1] = tempEvent;
+
 	}
 
 	for (i = 1; i < n; i++)
 	{
 		key = events[i].data.startMinute;
+		tempEvent = events[i];
 		j = i - 1;
 
-		/* Move elements of arr[0..i-1], that are
-		greater than key, to one position ahead
-		of their current position */
+		
 		while (j >= 0 && events[j].data.startMinute > key)
 		{
 			events[j + 1] = events[j];
 			j = j - 1;
 		}
-		events[j + 1].data.startMinute = key;
+		//events[j + 1].data.startMinute = key;
+		events[j + 1] = tempEvent;
 	}
 }
 
@@ -1032,9 +1034,7 @@ void pregledDogadjaja()
 
 	
 	std::vector<event> events;
-	//call insertion sort here
-	if(sortByDate == true)
-		insertionSort(events, events.size());
+	
 
 	while (true)
 	{
@@ -1050,6 +1050,10 @@ void pregledDogadjaja()
 			break;
 		}
 	}
+
+	//call insertion sort here
+	if (sortByDate == true)
+		insertionSort(events, events.size());
 
 	//ispisati dogadjaje
 	while (true)
@@ -1095,7 +1099,7 @@ void pregledDogadjaja()
 
 			std::cout << std::string(categoryLen, '-') << "+" << std::endl;
 			std::cout << "Kategorija: " << events[i].category << "|" << std::endl;
-			std::cout << std::string(categoryLen, '-') << "+";
+			std::cout << std::string(categoryLen, '-') << "+" << std::endl;
 
 			if (events[i].data.specialRequirements.size() > 0)
 			{
