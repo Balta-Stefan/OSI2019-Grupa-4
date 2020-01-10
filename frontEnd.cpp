@@ -15,6 +15,7 @@
 #include <cereal/types/vector.hpp>
 #include <iomanip>
 #include <algorithm>
+#include <sstream>
 
 //VAZNA NAPOMENA, ZABRANITI DODAVANJE DOGADJAJA SA ISTIM IMENOM
 
@@ -1178,32 +1179,66 @@ void printMenu()
 	std::cout <<"			 | 0)Izlaz" << std::setw(51) << "|" << std::endl;
 	std::cout <<"			 | 1)Pregled dogadjaja" << std::setw(39) << "|" << std::endl;
 	std::cout <<"			 | 2)Igranje kviza" << std::setw(43) << "|" << std::endl;
-
+	std::cout << "			 | 3)Informacije" << std::setw(45) << "|" << std::endl;
 	
 	if (loggedIn)
 	{
-		std::cout << "			 | 3)Dodavanje dogadjaja" << std::setw(37) << "|" << std::endl;
-		std::cout << "			 | 4)Pregled vlastitih dogadjaja" << std::setw(29) << "|" << std::endl;
+		std::cout << "			 | 4)Dodavanje dogadjaja" << std::setw(37) << "|" << std::endl;
+		std::cout << "			 | 5)Pregled vlastitih dogadjaja" << std::setw(29) << "|" << std::endl;
 	}
 	else
-		std::cout <<"			 | 3)Prijava" << std::setw(49) << "|" << std::endl;
+		std::cout <<"			 | 4)Prijava" << std::setw(49) << "|" << std::endl;
 
 	if (userRank == 1)
 	{
-		std::cout << "			 | 5)Banovanje korisnika" <<  std::setw(37) << "|" << std::endl;
-		std::cout << "			 | 6)Izmjena kategorija" <<  std::setw(38) << "|" << std::endl;
-		std::cout << "			 | 7)Izmjena kviza" <<  std::setw(43) << "|" << std::endl;
+		std::cout << "			 | 6)Banovanje korisnika" <<  std::setw(37) << "|" << std::endl;
+		std::cout << "			 | 7)Izmjena kategorija" <<  std::setw(38) << "|" << std::endl;
+		std::cout << "			 | 8)Izmjena kviza" <<  std::setw(43) << "|" << std::endl;
 	}
 
+	
 	std::cout << std::setw(85) << "+ ---------------------------------------------------------+" << std::endl;
 }
 
 //		std::this_thread::sleep_for(std::chrono::milliseconds(200));
 
+void displayInfo(std::string info)
+{
+	system("cls");
+	
+	std::string input;
+	std::cout << info << std::endl;
+	
+	std::cout << std::endl << std::endl;
 
+	std::cout << "Unesite bilo sta za povratak u meni" << std::endl;
+	std::cin >> input;
+	
+}
 
 int main()
 {
+	std::ofstream getInfo("getInfo.txt");
+	getInfo.close();
+	std::string info;
+	
+	
+
+	while (true)
+	{
+		std::ifstream getInfoResponse("getInfoResponse.txt");
+		std::this_thread::sleep_for(std::chrono::milliseconds(200));
+		if (getInfoResponse.is_open())
+		{
+			std::stringstream buffer;
+			buffer << getInfoResponse.rdbuf();
+			info = buffer.str();
+			getInfoResponse.close();
+			remove("getInfoResponse.txt");
+			break;
+		}
+	}
+
 	bool run = true;
 	while (run)
 	{
@@ -1220,35 +1255,38 @@ int main()
 		case 1:
 			pregledDogadjaja();
 			break;
+		case 2:
+			igrajKviz();
+			break;
 		case 3:
+			displayInfo(info);
+			break;
+		case 4:
 			if (loggedIn)
 				dodavanjeDogadjaja();
 			else
 				logIn();
 			break;
-		case 2:
-			igrajKviz();
-			break;
-		case 4:
+		case 5:
 			if (!loggedIn)
 				logIn();
 			else
 				pregledVlastitihDogadaja();
 			break;
-		case 5:
+		case 6:
 			if (loggedIn && userRank == 1)
 				banovanjeKorisnika();
 			else
 				greska();
 			break;
 
-		case 6:
+		case 7:
 			if (loggedIn && userRank == 1)
 				izmjenaKategorija();
 			else
 				greska();
 			break;
-		case 7:
+		case 8:
 			if (loggedIn && userRank == 1)
 				izmjenaKviza();
 			else
