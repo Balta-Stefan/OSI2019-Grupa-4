@@ -1,2 +1,3 @@
 Administratorski dio sistema predstavlja program Backend.exe dok korisnički dio predstavlja Frontend.exe.Svi
 fajlovi moraju biti u istom folderu.Podrazumijeva se da korisnički dio ne može funkcionisati bez administratorskog dijela.
+Program RegistracijaKorisnika.exe se koristi za registraciju korisnika (koriste ju vlasnici sistema, ne korisnici).
