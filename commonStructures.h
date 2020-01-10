@@ -1,6 +1,18 @@
 #ifndef COMMONSTRUCTURES_H_INCLUDED
 #define COMMONSTRUCTURES_H_INCLUDED
 
+
+
+struct deleteEvent
+{
+	std::string sessionID, eventName;
+	template <class Archive>
+	void serialize(Archive& ar)
+	{
+		ar(sessionID, eventName);
+	}
+};
+
 struct eventsFilter
 {
 	bool todayEvents, futureEvents, pastEvents;

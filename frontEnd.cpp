@@ -29,6 +29,18 @@ bool loggedIn = false;
 std::string successfulLogOut = "Uspjesno odjavljivanje.";
 
 
+
+struct deleteEvent
+{
+	std::string sessionID, eventName;
+	template <class Archive>
+	void serialize(Archive& ar)
+	{
+		ar(sessionID, eventName);
+	}
+};
+
+
 struct eventsFilter
 {
 	bool todayEvents, futureEvents, pastEvents;
@@ -197,6 +209,62 @@ void greska()
 	system("cls");
 }
 
+
+void removeEvent(std::string eventForRemoval)
+{
+	//prikazati sve dogadjaje ako je korisnik administrator
+	//ako korisnik nije administrator, onda prikazati samo vlastite dogadjaje
+
+	if (loggedIn)
+	{
+		deleteEvent tempStruct;
+		std::ofstream requestFile("deleteEvent2.bin", std::ios::binary);
+
+		if (eventForRemoval == "")
+		{
+			std::string toDelete;
+			std::cout << "Unesite ime dogadjaja koji zelite obrisati: " << std::endl;
+			std::cin.ignore();
+			std::getline(std::cin, toDelete); //mozda potreban cin.ignore()?
+			tempStruct.eventName = toDelete;
+
+		}
+		else
+			tempStruct.eventName = eventForRemoval;
+
+		tempStruct.sessionID = sessionID;
+
+		cereal::BinaryOutputArchive oarchive(requestFile);
+		oarchive(tempStruct);
+		requestFile.close();
+
+		rename("deleteEvent2.bin", "deleteEvent.bin");
+
+		while (true)
+		{
+			std::this_thread::sleep_for(std::chrono::milliseconds(200));
+			std::ifstream response("deleteEventResponse.txt");
+			if (response.is_open())
+			{
+				std::string tempString;
+				std::getline(response, tempString);
+
+				std::cout << tempString << std::endl;
+				break;
+			}
+		}
+
+	}
+	else
+		greska();
+
+	remove("deleteEventResponse.txt");
+	std::string tempString;
+	std::cout << "Unesite bilo sta za povratak:" << std::endl;
+	std::cin >> tempString;
+}
+
+
 void izmjenaKviza()
 {
 	std::ofstream request("editQuizRequest2.txt");
@@ -318,11 +386,54 @@ void izmjenaKviza()
 }
 
 
+void addEventTime(eventList& tempEvent)
+{
+	std::cout << "Pocetak (sat)" << " ";
+	std::cin >> tempEvent.startHour;
+	std::cout << std::endl;
+
+	std::cout << "Pocetak (minuta)" << " ";
+	std::cin >> tempEvent.startMinute;
+	std::cout << std::endl;
+
+	std::cout << "Pocetak (mjesec)" << " ";
+	std::cin >> tempEvent.startMonth;
+	std::cout << std::endl;
+
+	std::cout << "Pocetak (dan)" << " ";
+	std::cin >> tempEvent.startDay;
+	std::cout << std::endl;
+
+	std::cout << "Pocetak (godina)" << " ";
+	std::cin >> tempEvent.startYear;
+	std::cout << std::endl;
+
+	std::cout << "Kraj (sat)" << " ";
+	std::cin >> tempEvent.endHour;
+	std::cout << std::endl;
+
+	std::cout << "Kraj (minuta)" << " ";
+	std::cin >> tempEvent.endMinute;
+	std::cout << std::endl;
+
+	std::cout << "Kraj (mjesec)" << " ";
+	std::cin >> tempEvent.endMonth;
+	std::cout << std::endl;
+
+	std::cout << "Kraj (dan)" << " ";
+	std::cin >> tempEvent.endDay;
+	std::cout << std::endl;
+
+	std::cout << "Kraj (godina)" << " ";
+	std::cin >> tempEvent.endYear;
+	std::cout << std::endl;
+}
 
 
 void dodavanjeDogadjaja()
 {
 	//backend gives answer via a text file called addEventAnswer.txt
+	system("cls");
 
 	newEvent tempEvent;
 	tempEvent.sessionID = sessionID;
@@ -331,52 +442,14 @@ void dodavanjeDogadjaja()
 	std::cout << "Ime dogadjaja: " << std::endl;
 	std::cin.ignore();
 	std::getline(std::cin, tempEvent.eventData.eventName);
-	std::cout << "Ime je: " << tempEvent.eventData.eventName << std::endl;
+	
 	//std::cin >> tempEvent.eventData.eventName;
 	std::cout << "Kratak opis:" << std::endl;
 	//std::cin.ignore();
 	std::getline(std::cin, tempEvent.eventData.shortDescription);
-	std::cout << "Kratki opis je: " << tempEvent.eventData.shortDescription << std::endl;
+	
 
-	std::cout << "Pocetak (sat)" << " ";
-	std::cin >> tempEvent.eventData.startHour;
-	std::cout << std::endl;
-
-	std::cout << "Pocetak (minuta)" << " ";
-	std::cin >> tempEvent.eventData.startMinute;
-	std::cout << std::endl;
-
-	std::cout << "Pocetak (mjesec)" << " ";
-	std::cin >> tempEvent.eventData.startMonth;
-	std::cout << std::endl;
-
-	std::cout << "Pocetak (dan)" << " ";
-	std::cin >> tempEvent.eventData.startDay;
-	std::cout << std::endl;
-
-	std::cout << "Pocetak (godina)" << " ";
-	std::cin >> tempEvent.eventData.startYear;
-	std::cout << std::endl;
-
-	std::cout << "Kraj (sat)" << " ";
-	std::cin >> tempEvent.eventData.endHour;
-	std::cout << std::endl;
-
-	std::cout << "Kraj (minuta)" << " ";
-	std::cin >> tempEvent.eventData.endMinute;
-	std::cout << std::endl;
-
-	std::cout << "Kraj (mjesec)" << " ";
-	std::cin >> tempEvent.eventData.endMonth;
-	std::cout << std::endl;
-
-	std::cout << "Kraj (dan)" << " ";
-	std::cin >> tempEvent.eventData.endDay;
-	std::cout << std::endl;
-
-	std::cout << "Kraj (godina)" << " ";
-	std::cin >> tempEvent.eventData.endYear;
-	std::cout << std::endl;
+	addEventTime(tempEvent.eventData);
 
 
 	std::cout << "Lokacija: ";
@@ -614,62 +687,76 @@ void igrajKviz()
 
 }
 
+void concreteEventTransaction(event& eventVar, std::string eventName)
+{
+	std::ofstream file("getEvent.txt");
+	file << eventName;
+	file.close();
+
+	while (true)
+	{
+		std::this_thread::sleep_for(std::chrono::milliseconds(200));
+		std::ifstream response("getEventResponse.bin", std::ios::binary);
+
+		if (response.is_open())
+		{
+			cereal::BinaryInputArchive iarchive(response);
+			iarchive(eventVar);
+			response.close();
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			remove("getEventResponse.bin");
+			break;
+		}
+	}
+}
+
+void printEventData(event &tempEvent)
+{
+	system("cls");
+	//pocetak ispisa podataka o dogadjaju
+	std::cout << "Ime dogadjaja: " << tempEvent.data.eventName << std::endl;
+	std::cout << "Trajanje dogadjaja: " <<
+		tempEvent.data.startDay << "." << tempEvent.data.startMonth << "." << tempEvent.data.startYear << " " <<
+		tempEvent.data.startHour << ":" << tempEvent.data.startMinute << "-" <<
+		tempEvent.data.endDay << "." << tempEvent.data.endMonth << "." << tempEvent.data.endYear << " " <<
+		tempEvent.data.endHour << ":" << tempEvent.data.endMinute << std::endl;
+	std::cout << "Lokacija: " << tempEvent.data.location << std::endl;
+	if (tempEvent.data.specialRequirements.size() > 0)
+	{
+		std::cout << "Posebni zahtjevi: " << std::endl;
+		for (auto& i : tempEvent.data.specialRequirements)
+			std::cout << i << std::endl;
+	}
+
+	std::cout << "Kategorija: " << tempEvent.category << std::endl;
+	std::cout << "Opis: " << std::endl;
+	std::cout << tempEvent.description << std::endl;
+
+	std::cout << "Komentari:" << std::endl;
+	for (unsigned int i = 0; i < tempEvent.userNames.size(); i++)
+	{
+		std::cout << i + 1 << ")";
+		std::cout << tempEvent.userNames[i] << std::endl;
+		std::cout << tempEvent.comments[i] << std::endl;
+	}
+
+	//kraj ispisa podataka o dogadjaju
+}
+
 void getEvent(std::string eventName)
 {
 
 	while (true)
 	{
-		std::ofstream file("getEvent.txt");
-		file << eventName;
-		file.close();
+		
 
 		event tempEvent;
-		while (true)
-		{
-			std::this_thread::sleep_for(std::chrono::milliseconds(200));
-			std::ifstream response("getEventResponse.bin", std::ios::binary);
+		concreteEventTransaction(tempEvent, eventName);
 
-			if (response.is_open())
-			{
-				cereal::BinaryInputArchive iarchive(response);
-				iarchive(tempEvent);
-				response.close();
-				std::this_thread::sleep_for(std::chrono::milliseconds(100));
-				remove("getEventResponse.bin");
-				break;
-			}
-		}
+		printEventData(tempEvent);
 
 
-
-		system("cls");
-		std::cout << "Ime dogadjaja: " << tempEvent.data.eventName << std::endl;
-		std::cout << "Trajanje dogadjaja: " <<
-			tempEvent.data.startDay << "." << tempEvent.data.startMonth << "." << tempEvent.data.startYear << " " <<
-			tempEvent.data.startHour << ":" << tempEvent.data.startMinute << "-" <<
-			tempEvent.data.endDay << "." << tempEvent.data.endMonth << "." << tempEvent.data.endYear << " " <<
-			tempEvent.data.endHour << ":" << tempEvent.data.endMinute << std::endl;
-		std::cout << "Lokacija: " << tempEvent.data.location << std::endl;
-		if (tempEvent.data.specialRequirements.size() > 0)
-		{
-			std::cout << "Posebni zahtjevi: " << std::endl;
-			for (auto& i : tempEvent.data.specialRequirements)
-				std::cout << i << std::endl;
-		}
-
-		std::cout << "Kategorija: " << tempEvent.category << std::endl;
-		std::cout << "Opis: " << std::endl;
-		std::cout << tempEvent.description << std::endl;
-
-		std::cout << "Komentari:" << std::endl;
-		for (unsigned int i = 0; i < tempEvent.userNames.size(); i++)
-		{
-			std::cout << i + 1 << ")";
-			std::cout << tempEvent.userNames[i] << std::endl;
-			std::cout << tempEvent.comments[i] << std::endl;
-		}
-
-
+		
 		std::cout << std::endl;
 
 		std::cout << "1)Izlaz" << std::endl;
@@ -972,15 +1059,118 @@ void logOut()
 
 }
 
-void pregledVlastitihDogadaja()
+
+void editOwnEvent(std::string event2Edit)
 {
-	system("cls");
+	event tempEvent;
+	
+	concreteEventTransaction(tempEvent, event2Edit);
+
+	//delete vector comments
+	tempEvent.commentIDs.clear();
+	tempEvent.comments.clear();
+	tempEvent.userNames.clear();
+
+	printEventData(tempEvent);
+	
+	char choice;
+	std::cout << "Da li zelite obrisati dogadjaj? (d/n)" << std::endl;
+	std::cin >> choice;
+
+	if (choice == 'd')
+	{
+		removeEvent(event2Edit);
+	}
+	else if (choice == 'n')
+	{
+		std::cout << "Da li zelite izmijeniti kratki opis? (d/n)" << std::endl;
+		std::cin >> choice;
+
+		if (choice == 'd')
+		{
+			std::cout << "Unesite novi kratki opis:" << std::endl;
+			std::string tempStr;
+			std::cin.ignore();
+			std::getline(std::cin, tempStr); //mozda treba cin.ignore()
+
+			tempEvent.data.shortDescription = tempStr;
+		}
+
+		std::cout << "Da li zelite izmijeniti kategoriju? (d/n)" << std::endl;
+		std::cin >> choice;
+
+		if (choice == 'd')
+		{
+			std::cout << "Unesite novu kategoriju:" << std::endl;
+			std::string tempStr;
+			std::cin.ignore();
+			std::getline(std::cin, tempStr); //mozda treba cin.ignore()
+
+			tempEvent.category = tempStr;
+		}
+
+		std::cout << "Da li zelite izmijeniti vrijeme? (d/n)" << std::endl;
+		std::cin >> choice;
+
+		if (choice == 'd')
+		{
+			std::cout << "Unesite novo vrijeme:" << std::endl;
+			addEventTime(tempEvent.data);
+			
+
+		}
+
+		std::cout << "Da li zelite izmijeniti lokaciju? (d/n)" << std::endl;
+		std::cin >> choice;
+
+		if (choice == 'd')
+		{
+			std::cout << "Unesite novu lokaciju:" << std::endl;
+			std::string tempStr;
+			std::cin.ignore(); //cin ignore, mozda je greska
+			std::getline(std::cin, tempStr);
+			tempEvent.data.location = tempStr;
+
+		}
+		//send data to server
+		std::ofstream outputFile("editOwnEvent2.bin", std::ios::binary);
+
+		cereal::BinaryOutputArchive oarchive(outputFile);
+		oarchive(tempEvent);
+		outputFile.close();
+		rename("editOwnEvent2.bin", "editOwnEvent.bin");
+
+		while (true)
+		{
+			std::this_thread::sleep_for(std::chrono::milliseconds(200));
+			std::ifstream response("editOwnEventResponse.txt");
+			if (response.is_open())
+			{
+				std::string tempStr;
+				std::getline(response, tempStr);
+				std::cout << tempStr << std::endl;
+				response.close();
+				std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+				remove("editOwnEventResponse.txt");
+				break;
+			}
+		}
+
+	}
+
+
+
+
+}
+
+void pregledVlastitihDogadajaTransaction(std::vector<std::string>& ownEvents)
+{
 	std::ofstream file("ownEventsRequest.txt");
 	file << sessionID;
 	file.close();
 
 
-	std::vector<std::string> ownEvents;
+	
 	while (true)
 	{
 		std::this_thread::sleep_for(std::chrono::milliseconds(200));
@@ -995,9 +1185,26 @@ void pregledVlastitihDogadaja()
 			break;
 		}
 	}
+}
+
+void pregledVlastitihDogadaja()
+{
+	
+	std::vector<std::string> ownEvents;
+	pregledVlastitihDogadajaTransaction(ownEvents);
+
+	bool removed = false;
 
 	while (true)
 	{
+		if (removed == true)
+		{
+			pregledVlastitihDogadajaTransaction(ownEvents);
+			removed = false;
+		}
+			
+
+		system("cls");
 		for (unsigned int i = 0; i < ownEvents.size(); i++)
 			std::cout << i + 1 << ")" << ownEvents[i] << std::endl;
 
@@ -1005,6 +1212,7 @@ void pregledVlastitihDogadaja()
 		int response;
 		std::cout << "1)Pregledaj dogadjaj" << std::endl;
 		std::cout << "2)Izlaz" << std::endl;
+		std::cout << "3)Promjena dogadjaja" << std::endl;
 		std::cin >> response;
 
 		if (response == 1)
@@ -1024,6 +1232,20 @@ void pregledVlastitihDogadaja()
 		else if (response == 2)
 		{
 			break;
+		}
+		else if (response == 3)
+		{
+			unsigned int event;
+			std::cout << "Unesite redni broj dogadjaja" << std::endl;
+			std::cin >> event;
+			if ((event > 0) && (event <= ownEvents.size()))
+			{
+				editOwnEvent(ownEvents[event - 1]);
+				removed = true;
+			}
+				
+			else
+				greska();
 		}
 		else
 			greska();
@@ -1172,6 +1394,8 @@ void izmjenaKategorija()
 
 }
 
+
+
 void printMenu()
 {
 	system("cls");
@@ -1185,15 +1409,16 @@ void printMenu()
 	{
 		std::cout << "			 | 4)Dodavanje dogadjaja" << std::setw(37) << "|" << std::endl;
 		std::cout << "			 | 5)Pregled vlastitih dogadjaja" << std::setw(29) << "|" << std::endl;
+		std::cout << "			 | 6)Brisanje dogadjaja" << std::setw(38) << "|" << std::endl;
 	}
 	else
 		std::cout <<"			 | 4)Prijava" << std::setw(49) << "|" << std::endl;
 
 	if (userRank == 1)
 	{
-		std::cout << "			 | 6)Banovanje korisnika" <<  std::setw(37) << "|" << std::endl;
-		std::cout << "			 | 7)Izmjena kategorija" <<  std::setw(38) << "|" << std::endl;
-		std::cout << "			 | 8)Izmjena kviza" <<  std::setw(43) << "|" << std::endl;
+		std::cout << "			 | 7)Banovanje korisnika" <<  std::setw(37) << "|" << std::endl;
+		std::cout << "			 | 8)Izmjena kategorija" <<  std::setw(38) << "|" << std::endl;
+		std::cout << "			 | 9)Izmjena kviza" <<  std::setw(43) << "|" << std::endl;
 	}
 
 	
@@ -1275,18 +1500,24 @@ int main()
 			break;
 		case 6:
 			if (loggedIn && userRank == 1)
+				removeEvent("");
+			else
+				greska();
+			break;
+		case 7:
+			if (loggedIn && userRank == 1)
 				banovanjeKorisnika();
 			else
 				greska();
 			break;
 
-		case 7:
+		case 8:
 			if (loggedIn && userRank == 1)
 				izmjenaKategorija();
 			else
 				greska();
 			break;
-		case 8:
+		case 9:
 			if (loggedIn && userRank == 1)
 				izmjenaKviza();
 			else

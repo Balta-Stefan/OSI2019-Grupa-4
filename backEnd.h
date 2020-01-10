@@ -8,6 +8,7 @@
 #include <ctime>
 #include <cstdlib>
 #include <Windows.h>
+#include "commonStructures.h"
 
 //global variable: vector<struct session> sessions
 
@@ -57,7 +58,8 @@ bool checkSessionID(std::string&);
 std::string logOut(std::string sessionID);
 bool checkCommentID(std::string&, std::string&);
 std::vector<event> getFilteredEvents(struct eventsFilter &);
-//std::vector<std::string> getOwnEvents(std::string& sessionID);
+std::string removeEvent(deleteEvent&);
+std::vector<std::string> getOwnEvents(std::string& sessionID);
 
 
 
